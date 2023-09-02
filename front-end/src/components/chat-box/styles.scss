@@ -1,0 +1,49 @@
+.chat-box {
+    background-color: #000;
+    font-family: monospace;
+    color: #ccc;
+    .chat-header {
+        color: #fff;
+        padding: 10px;
+        margin-bottom: 10px;
+        font-weight: bolder;
+        font-size: 24px;
+    }
+    .chat-body {
+        height: 362px;
+        overflow: hidden scroll;
+        .user-message::before {
+            content: 'You: ',
+        }
+        .user-message , .opponent-message {
+            margin-left: 5px;
+            margin-block: 10px;
+        }
+        .opponent-message::before {
+            content: 'Other: ';
+            color: #888;
+        }
+    }
+    .chat-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        .plus-icon {
+            padding: 10px;
+            font-size: larger;
+            cursor: pointer;
+        }
+        .file-label {
+            cursor: pointer;
+            input {
+                visibility: hidden;
+                width: 5px;
+            }
+        }
+        input {
+            padding: 5px;
+            border-radius: 8px;
+        }
+    }
+   
+}

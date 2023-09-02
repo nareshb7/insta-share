@@ -1,0 +1,63 @@
+.nav-page {
+    background-color: #888;
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 20px;
+    .nav-header {
+        font-weight: bold;
+        font-size: 24px;
+    }
+    .user-card {
+        padding: 10px;
+        background: #eee;
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+    .nav-list  {
+        list-style: none;
+        margin: 0;
+        li {
+            display: inline-block;
+            padding: 10px;
+            margin-inline: 20px;
+        }
+    }
+}
+
+.auth-page {
+    .login-page {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+}
+.chat-main {
+    display: flex;
+    .emp-list {
+        width: 20%;
+        .card {
+            overflow: hidden scroll;
+            height: 400px;
+        }
+    }
+    .chat-box {
+        width: 80%;
+    }
+    
+}
+
+.footer {
+    background-color: #888;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    .footer-logo > img {
+        width: 100px;
+        border-radius: 50%;
+    }
+    .footer-links {
+        .section-1  li{
+            list-style-type: none;
+        }
+    }
+}
