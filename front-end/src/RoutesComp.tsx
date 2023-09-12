@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useUserContext } from './context/UserContext';
 import MessagesPage from './pages/MessagesPage';
 import Login from './pages/Login';
@@ -11,14 +11,14 @@ const RoutesPage = () => {
   if (userContext === null) {
     return <div>Loading...</div>
   }
-  // const {userData} = userContext
+  const {userData} = userContext
   return (
     <div className="routes">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route
           path="/messages"
-          element={<MessagesPage />}
+          element={userData.roomId ? <MessagesPage /> : <Navigate to='/' />}
         />
       </Routes>
     </div>

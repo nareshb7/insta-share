@@ -1,7 +1,10 @@
 /* styles.scss */
 
 $primary-color: #007bff;
-
+* {
+  margin: 0;
+  padding: 0;
+}
 .App {
   font-family: Arial, sans-serif;
   height: 100vh;

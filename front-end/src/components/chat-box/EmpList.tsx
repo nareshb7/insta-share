@@ -1,24 +1,22 @@
 import React from 'react'
 import Card from '../../utils/reusable/Card';
 import { UserData } from '../../context/Models';
+import { RoomSliceState } from '../../store/sliceFiles/RoomSlice';
 
-const mockUsers: UserData = {
-  userName:'Naresh Baleboina',
-  roomName: '010001',
-  roomId:'Room No .1'
-}
 interface EmpListProps {
   userData: UserData
+  roomData: RoomSliceState
 }
 
-const EmpList = ({userData}: EmpListProps ) => {
-  
+const EmpList = ({userData, roomData}: EmpListProps ) => {
 
   return (
     <div className='emp-list'>
-      <h2>{userData.userName}</h2>
-      <h2>Employee List</h2>
-      <Card data={Array(10).fill(mockUsers)} render={(item)=> <h4>{item.name}</h4>}/>
+      <h2>User: <span style={{color:'#888'}}>{userData.userName}</span></h2>
+      <hr />
+      <h1 style={{color:'#444'}}>Members List: </h1>
+      <hr />
+      <Card data={roomData.users} render={(item)=> <h4>{item.userName}</h4>}/>
     </div>
   )
 }
