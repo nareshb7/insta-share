@@ -1,29 +1,38 @@
 import { call, put, takeLatest } from "redux-saga/effects"
 import { CreateRoomPayload, createRoomApi, joinRoomApi } from "../api/RoomHandlerApi"
 import { createRoomAction, joinRoomAction } from "./Actions"
-import { RoomSliceState, createRoom, fetchRoomDataFailure, joinRoom } from "../sliceFiles/RoomSlice"
+import { RoomSliceState, fetchRoomDataFailure, joinRoom } from "../sliceFiles/RoomSlice"
 
 
 function* createRooomWorker (action: {payload: CreateRoomPayload}): Generator<unknown, void, RoomSliceState> {
     try {
         const data = yield call(createRoomApi, action.payload)
-        console.log('CREATE_ROM::', data)
-        yield put(createRoom(data))
-    } catch (e) {
-        if (e) {
-            yield put(fetchRoomDataFailure(e.message as string));
-            console.error('CREATE_ROOM_ERROR::', e);
-          } else {
-            // Handle other types of errors
-            console.error('Other error:', e);
-          }
+        if (data?.error) {
+            yield put(fetchRoomDataFailure(data.error as string));
+        } else if (data.roomId) {
+            yield put(joinRoom(data))
+        }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e : any) {
+        yield put(fetchRoomDataFailure(e as string));
+        console.error('CREATE_ROOM_ERROR::', e.Error);
     }
 }
 function* joinRoomWorker (action: {payload: CreateRoomPayload}): Generator<unknown, void, RoomSliceState> {
     try {
-        const data = yield call(joinRoomApi, action.payload )
-        yield put(joinRoom(data))
-    } catch (e) {
+        const data = yield call(joinRoomApi, action.payload)
+        console.log('SAGA::', data)
+        if (data?.error) {
+            yield put(fetchRoomDataFailure(data.error as string));
+        } else if (data.roomId) {
+            console.log('SAGA::SUCCESS', data)
+            yield put(joinRoom(data))
+        }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        yield put(fetchRoomDataFailure(e as string));
         console.error('JOIN_ROOM_ERROR::', e)
     }
 }

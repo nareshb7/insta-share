@@ -7,6 +7,7 @@ export interface CreateRoomPayload {
     isProtected: boolean
     password?: string
     roomName?: string
+    isNewUser?: boolean
 }
 export interface JoinRoomPayload {
     roomId: string,

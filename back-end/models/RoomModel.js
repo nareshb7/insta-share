@@ -1,30 +1,34 @@
-const mongoose =require('mongoose')
+const mongoose = require("mongoose");
 
-const roomSchema = new mongoose.Schema({
+const roomSchema = new mongoose.Schema(
+  {
     roomId: {
-        type:String,
-        require: true
+      type: String,
+      require: true,
+      unique: true,
     },
     roomName: {
-        type: String,
-        requrie: true
+      type: String,
+      requrie: true,
     },
     userName: {
-        require: true,
-        type:String
+      require: true,
+      type: String,
     },
     isProtected: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     users: {
-        type:Array,
-        default: []
+      type: Array,
+      default: [],
     },
     messages: {
-        type: Array,
-        default:[]
+      type: Array,
+      default: [],
     },
-    password: String
-}, {timestamps: true})
-module.exports = RoomModel = new mongoose.model('room', roomSchema)
+    password: String,
+  },
+  { timestamps: true }
+);
+module.exports.RoomModel = new mongoose.model("room", roomSchema);
