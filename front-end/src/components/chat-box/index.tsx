@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client';
 // import { useUserContext } from '../../../context/UserContext'
 import './styles.scss';
 import { HandleChangeProps } from '../models/AuthModels';
@@ -14,18 +14,28 @@ import { Message } from '../../store/sliceFiles/MessagesSlice';
 interface ChatBoxProps {
   userData: UserData;
   state: RootState;
-  socket: Socket
+  socket: Socket;
 }
+const supportedFormats = [
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/x-zip-compressed',
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+];
+
+
 const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
   const { messages } = state;
   socket.off('new-message').on('new-message', (msz) => {
-    console.log('MSZ::RECEIVED', msz)
-    setTotalMessages(prev => ([...prev, msz]))
-  })
-  const [totalMessages, setTotalMessages] = useState<Message[]>(messages.messages)
-  console.log('CHAT_BOX::', totalMessages)
+    console.log('MSZ::RECEIVED', msz);
+    setTotalMessages((prev) => [...prev, msz]);
+  });
+  const [totalMessages, setTotalMessages] = useState<Message[]>(messages.messages);
+  console.log('CHAT_BOX::', totalMessages);
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
@@ -33,55 +43,55 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
     const className = msz.from === userData.userName ? 'user-message' : 'opponent-message';
     return (
       <div className={className} key={msz._id}>
-        <span className='author'>{msz.from}:</span> <span className='content'>{msz.content}</span>
+        <span className="author">{msz.from}:</span>{' '}
+        <span className="content">{msz.content}</span>
       </div>
     );
   };
-  const supportedFormats = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.openxmlformats-officedocument.wordprocessingml.document" ,"application/x-zip-compressed", "application/pdf", "image/jpeg", "image/png"]
+  
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('FILE::', e.target.files?.[0], state);
     if (e.target.files !== null) {
-      const {name, size , type} = e.target.files[0]
-      if (supportedFormats.find(val => val.includes(type))) {
-        console.log('DATA::', name, size, type)
+      const { name, size, type } = e.target.files[0];
+      if (supportedFormats.find((val) => val.includes(type))) {
+        console.log('DATA::', name, size, type);
         if (size < 3000000) {
-          console.log('OK ', supportedFormats)
-          handleMessage(name, type)
+          console.log('OK ', supportedFormats);
+          handleMessage(name, type);
         } else {
-          console.log('More than 3 mb not allowed ')
+          console.log('More than 3 mb not allowed ');
         }
       } else {
-        console.log('File Format not supported')
+        console.log('File Format not supported');
       }
-
     }
     // const file : File | null= e.target.files?.[0] || null
     // setTotalMessages((prev) => [...prev, file?.name || ''])
   };
-  const handleMessage = (content = message, type= 'message') => {
+  const handleMessage = (content = message, type = 'message') => {
     console.log('SENT::', content);
     if (!content) {
       return '';
     }
-    const msz : Message = {
+    const msz: Message = {
       content,
       from: userData.userName,
       to: userData.roomId,
       type,
-    }
+    };
     setMessage('');
-    setTotalMessages([...totalMessages, msz])
-    socket.emit('add-message', msz)
+    setTotalMessages([...totalMessages, msz]);
+    socket.emit('add-message', msz);
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleMessage()
-  }
+    if (e.key === 'Enter') handleMessage();
+  };
   useEffect(() => {
     dispatch(getRoomMessages(userData.roomId));
   }, []);
-  useEffect(()=> {
-    setTotalMessages(messages.messages)
-  }, [messages.messages])
+  useEffect(() => {
+    setTotalMessages(messages.messages);
+  }, [messages.messages]);
   return (
     <div className="chat-box">
       <div className="chat-header">
