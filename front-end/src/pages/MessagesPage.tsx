@@ -31,14 +31,12 @@ const MessagesPage = () => {
     if (state.room.error) {
       setErrorMessage(state.room.error);
     }
-    console.log('USEEF::', state)
   }, [state.room.error]);
   if (userContext === null) {
     // Handle the case where the context is null
     return <div>Loading...</div>; // or some other fallback
   }
   const { userData, socket } = userContext;
-  console.log('STATE::MSZ::', state);
   return (
     <>
       {' '}

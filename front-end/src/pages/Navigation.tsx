@@ -3,22 +3,26 @@ import './styles.scss'
 import { Button } from '../utils/reusable/styles/Design'
 import { useUserContext } from '../context/UserContext'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { updateSuccessState } from '../store/sliceFiles/RoomSlice'
 
 const NavigationPage = () => {
   const userContext = useUserContext()
   const navigate =useNavigate()
+  const dispatch = useDispatch()
   if(userContext == null) {
     return <div>Loading...</div>
   }
   const {setUserData, userData} = userContext
   const handleLogout = () => {
+    dispatch(updateSuccessState())
     localStorage.removeItem('file-share-user')
-    navigate('/')
-    setUserData({
+    setUserData(() => ({
       userName: '',
       roomName: '',
       roomId:''
-    })
+    }))
+    navigate('/')
 
   }
   return (

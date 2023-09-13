@@ -10,66 +10,88 @@ import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
 import { RootState } from '../../store/Store';
 import { Message } from '../../store/sliceFiles/MessagesSlice';
+import { fileDownload, fileUpload } from '../../store/api/FileUploadApi';
+import { addNotification } from '../../store/sliceFiles/Notification';
+import { Severity } from '../../utils/Notification';
 
 interface ChatBoxProps {
   userData: UserData;
   state: RootState;
   socket: Socket;
 }
-const supportedFormats = [
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/x-zip-compressed',
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-];
-
-
+const getFileFromDb =async (id: string = '') => {
+  const file = await fileDownload(id)
+  const base64 = new Uint8Array(file.data.data)
+  const url = URL.createObjectURL(new Blob([base64], { type: file.type }))
+  const el = document.createElement('a')
+  el.href = url
+  el.download = file.fileName
+  el.click()
+  return url
+}
+const getMessageType = (data: string ): string => {
+  if (data.includes('pdf')) return 'application/pdf';
+  else if (data.includes('jpeg')) return 'image/jpeg';
+  return '';
+};
+const renderFile = (msz: Message, className = '') => {
+  switch (getMessageType(msz.type)) {
+    case 'application/pdf':
+    case 'image/jpeg': {
+      return (
+        <div className={className} key={msz._id}>
+          <span className="author">{msz.from}:</span>{' '}
+          <span className="content">{msz.content}</span>
+          <span className='download-icon' onClick={() => getFileFromDb(msz.fileId)}> &#8595; </span>
+        </div>
+      );
+    }
+  }
+};
 const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
   const { messages } = state;
   socket.off('new-message').on('new-message', (msz) => {
-    console.log('MSZ::RECEIVED', msz);
     setTotalMessages((prev) => [...prev, msz]);
   });
-  const [totalMessages, setTotalMessages] = useState<Message[]>(messages.messages);
-  console.log('CHAT_BOX::', totalMessages);
+  const [totalMessages, setTotalMessages] = useState<Message[]>(
+    messages.messages
+  );
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
   const messageRender = (msz: Message) => {
-    const className = msz.from === userData.userName ? 'user-message' : 'opponent-message';
-    return (
-      <div className={className} key={msz._id}>
-        <span className="author">{msz.from}:</span>{' '}
-        <span className="content">{msz.content}</span>
-      </div>
-    );
-  };
-  
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('FILE::', e.target.files?.[0], state);
-    if (e.target.files !== null) {
-      const { name, size, type } = e.target.files[0];
-      if (supportedFormats.find((val) => val.includes(type))) {
-        console.log('DATA::', name, size, type);
-        if (size < 3000000) {
-          console.log('OK ', supportedFormats);
-          handleMessage(name, type);
-        } else {
-          console.log('More than 3 mb not allowed ');
-        }
-      } else {
-        console.log('File Format not supported');
-      }
+    const className =
+      msz.from === userData.userName ? 'user-message' : 'opponent-message';
+
+    if (msz.type === 'message') {
+      return (
+        <div className={className} key={msz._id}>
+          <span className="author">{msz.from}:</span>{' '}
+          <span className="content">{msz.content}</span>
+        </div>
+      );
+    } else {
+      return renderFile(msz, className);
     }
-    // const file : File | null= e.target.files?.[0] || null
-    // setTotalMessages((prev) => [...prev, file?.name || ''])
   };
-  const handleMessage = (content = message, type = 'message') => {
-    console.log('SENT::', content);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files !== null) {
+      const formData = new FormData();
+      formData.append('file', e.target.files[0]);
+      const res = await fileUpload(formData);
+      if (res.error) {
+        dispatch(
+          addNotification({ content: res.error, severity: Severity.ERROR })
+        );
+        return '';
+      }
+      handleMessage(res.fileName, res.type, res._id);
+    }
+  };
+  const handleMessage = (content = message, type = 'message', fileId = '') => {
     if (!content) {
       return '';
     }
@@ -78,6 +100,7 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
       from: userData.userName,
       to: userData.roomId,
       type,
+      fileId,
     };
     setMessage('');
     setTotalMessages([...totalMessages, msz]);

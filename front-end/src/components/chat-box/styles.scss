@@ -15,11 +15,15 @@
         .user-message , .opponent-message {
             margin-left: 5px;
             margin-block: 10px;
+            .download-icon {
+                color: blue;
+                border-bottom: 2px solid blue;
+            }
         }
         .opponent-message {
             .author {
                 color:#888
-            }
+            } 
         }
     }
     .chat-footer {

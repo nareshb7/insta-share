@@ -11,7 +11,6 @@ function* getMessagesWorker (action: { payload: string }): Generator<unknown, vo
 
 function* sendMessageWorker(action: { payload: SendMessageType }) {
     try {
-      console.log('SENDMESSA::', action.payload)
       const data: Message = yield call(sendMessageAPi, action.payload);
       yield put(addNewMessage(data));
     } catch (error) {

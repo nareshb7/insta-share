@@ -7,15 +7,18 @@ import { UserData } from '../context/Models';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
 import { createRoomAction, joinRoomAction } from '../store/saga/Actions';
-import { fetchRoomDataFailure, fetchRoomDataStart } from '../store/sliceFiles/RoomSlice';
+import {
+  fetchRoomDataFailure,
+  fetchRoomDataStart,
+} from '../store/sliceFiles/RoomSlice';
 import { RootState } from '../store/Store';
 
 const Login = () => {
   const userContext = useUserContext();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const roomState = useSelector((state: RootState) => state.room)
-  const {isLoading, isSuccess, roomId} = roomState
+  const roomState = useSelector((state: RootState) => state.room);
+  const { isLoading, isSuccess, roomId } = roomState;
   const [isNewRoom, setNewRoom] = useState<boolean>(true);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [btnDisable, setBtnDisable] = useState<boolean>(true);
@@ -29,14 +32,12 @@ const Login = () => {
   const [password, setPassword] = useState<string>('');
   const [isNewUser, setIsNewUser] = useState<boolean>(true);
 
-
-useEffect(() => {
-  console.log('ISSUCESS', roomState)
-  if (isSuccess) {
-    socket.emit('join-room', roomId)
-    navigate('/messages')
-  }
-}, [isSuccess])
+  useEffect(() => {
+    if (isSuccess) {
+      socket.emit('join-room', roomId);
+      navigate('/messages');
+    }
+  }, [isSuccess]);
 
   if (userContext === null) {
     // Handle the case where the context is null
@@ -70,18 +71,19 @@ useEffect(() => {
   };
 
   const handleJoin = () => {
-    dispatch(fetchRoomDataStart())
+    dispatch(fetchRoomDataStart());
     userData.roomName = roomName;
-    userData.isProtected = isProtected
-    userData.password = password
+    userData.isProtected = isProtected;
+    userData.password = password;
     if (isNewRoom) {
       dispatch(createRoomAction({ ...userData, isProtected, password }));
     } else {
-      dispatch(joinRoomAction({...userData, isProtected, password, isNewUser}))
+      dispatch(
+        joinRoomAction({ ...userData, isProtected, password, isNewUser })
+      );
     }
-    setUserData(userData)
-    localStorage.setItem('file-share-user', JSON.stringify(userData))
-    // navigate('/messages');
+    setUserData(userData);
+    localStorage.setItem('file-share-user', JSON.stringify(userData));
   };
   const handleRoom = (status: boolean) => {
     setNewRoom(status);
@@ -93,15 +95,15 @@ useEffect(() => {
     };
     setErrorMessage(emptyObejct);
     setUserData(emptyObejct);
-    setIsProtected(false)
-    setRoomName('')
-    setPassword('')
-    dispatch(fetchRoomDataFailure(''))
+    setIsProtected(false);
+    setRoomName('');
+    setPassword('');
+    dispatch(fetchRoomDataFailure(''));
   };
-  const handleCheckbox = ()=> {
-    setIsProtected(!isProtected)
-    setPassword('')
-  }
+  const handleCheckbox = () => {
+    setIsProtected(!isProtected);
+    setPassword('');
+  };
   return (
     <div className="auth-page">
       <div className="login-page">
@@ -124,14 +126,18 @@ useEffect(() => {
                   onKeyUp={handleValidate}
                 />
               </label>
-              
-              {
-                !isNewRoom && <div><label>If you are new user click here
-                <input checked={isNewUser} onChange={(e)=> setIsNewUser(e.target.checked)} type='checkbox' />
-              </label></div>
-              }
-
-              
+              {!isNewRoom && (
+                <div>
+                  <label>
+                    If you are new user click here
+                    <input
+                      checked={isNewUser}
+                      onChange={(e) => setIsNewUser(e.target.checked)}
+                      type="checkbox"
+                    />
+                  </label>
+                </div>
+              )}
               <div className="error-message">{errorMessage.userName}</div>
             </div>
             <div>
@@ -163,9 +169,9 @@ useEffect(() => {
             )}
             <div>
               <label>
-                {
-                  isNewRoom ? 'Do u want it to be protected?': 'If its protected click checkbox to enter password'
-                }
+                {isNewRoom
+                  ? 'Do u want it to be protected?'
+                  : 'If its protected click checkbox to enter password'}
                 <input
                   type="checkbox"
                   checked={isProtected}
@@ -187,10 +193,10 @@ useEffect(() => {
 
             <Button
               disabled={btnDisable || isLoading}
-              text={isLoading? '...' : isNewRoom ? 'Create' : 'Join'}
+              text={isLoading ? '...' : isNewRoom ? 'Create' : 'Join'}
               onClick={handleJoin}
             />
-            <div className='error-message'>{roomState.error}</div>
+            <div className="error-message">{roomState.error}</div>
           </div>
         )}
       </div>
