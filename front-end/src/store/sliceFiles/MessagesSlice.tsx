@@ -8,6 +8,7 @@ export interface Message {
   type: string;
   __v?: string;
   _id?: string;
+  fileId?: string;
 }
 
 interface MessageSlice {

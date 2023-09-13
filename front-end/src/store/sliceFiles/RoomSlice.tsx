@@ -57,10 +57,12 @@ const roomSlice = createSlice({
         fetchRoomDataFailure: (state, action) => {
             state.isLoading = false
             state.error = action.payload
-
+        },
+        updateSuccessState: (state)=> {
+            state.isSuccess = false
         }
     }
 })
 
-export const {joinRoom, fetchRoomDataStart, fetchRoomDataFailure} = roomSlice.actions
+export const {joinRoom, fetchRoomDataStart, fetchRoomDataFailure, updateSuccessState} = roomSlice.actions
 export default roomSlice.reducer

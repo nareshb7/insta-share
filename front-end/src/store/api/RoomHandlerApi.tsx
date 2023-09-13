@@ -15,7 +15,6 @@ export interface JoinRoomPayload {
 }
 
 export const createRoomApi = async (params: CreateRoomPayload):Promise<RoomSliceState> => {
-    console.log('API::', params)
     return fetch(`${BE_URL}/room/createroom`, {
         method:'POST',
         headers: {

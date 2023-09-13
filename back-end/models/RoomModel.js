@@ -4,15 +4,15 @@ const roomSchema = new mongoose.Schema(
   {
     roomId: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     roomName: {
       type: String,
-      requrie: true,
+      required: true,
     },
     userName: {
-      require: true,
+      required: true,
       type: String,
     },
     isProtected: {

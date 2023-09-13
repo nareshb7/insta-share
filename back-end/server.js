@@ -7,11 +7,13 @@ require("dotenv").config();
 require("./Connection");
 const roomRoutes = require("./routes/RoomRoutes");
 const messageRoutes = require("./routes/MessageRoutes");
+const fileRoutes = require('./routes/Files')
 const MessageModel = require("./models/MessageModel");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: "10mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
@@ -24,6 +26,7 @@ app.get("/", (req, res) => {
 
 app.use("/room", roomRoutes);
 app.use("/message", messageRoutes);
+app.use("/files", fileRoutes)
 
 const io = new Server(server, {
   cors: {
@@ -34,7 +37,6 @@ const io = new Server(server, {
 io.on("connection", async (socket) => {
   console.log("SOCKET::", socket.id);
   socket.on("add-message",async (message) => {
-    console.log("MESSAGE::", message);
     const newMessage = new MessageModel(message);
     await newMessage.save();
     socket.broadcast.emit('new-message', newMessage)

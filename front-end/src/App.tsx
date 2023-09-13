@@ -3,20 +3,23 @@ import Navigation from './pages/Navigation';
 import RoutesPage from './RoutesComp';
 import Footer from './pages/Footer';
 import UserContext from './context/UserContext';
-import {Provider} from 'react-redux';
-import { store } from './store/Store';
+import { useSelector} from 'react-redux';
+import { RootState } from './store/Store';
+import Notification from './utils/Notification';
 
 
 const App = () => {
+  const {isNotificationEnabled, content, severity} = useSelector((state: RootState) => state.notification)
   return (
     <div className="App">
-      <Provider store={store}>
         <UserContext>
           <Navigation />
           <RoutesPage />
           <Footer />
+          {
+            isNotificationEnabled && <Notification content={content} severity={severity} />
+          }
         </UserContext>
-      </Provider>
     </div>
   );
 };

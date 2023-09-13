@@ -5,10 +5,6 @@ module.exports.createRoom = async (req, res) => {
   try {
     const { params } = req.body;
     console.log("CREATE_ROOM::", params);
-    const isExist = await RoomModel.findOne({ roomId: params.roomId });
-    if (isExist) {
-      throw new Error("Try new Room Id..., Its already using");
-    }
     const newRoom = new RoomModel({ ...params });
 
     newRoom.users.push({ userName: params.userName });
@@ -42,10 +38,13 @@ module.exports.joinRoom = async (req, res) => {
     const isExistedUser = newRoom.users.find(val => val.userName === params.userName)
     if (isExistedUser && params.isNewUser) {
       throw new Error("Someone has already joined with same User name");
-    } else if (!params.isNewUser && !isExistedUser) {
+    } else if (params.isNewUser && !isExistedUser) {
       newRoom.users.push({
         userName: params.userName,
       });
+    } else if (!params.isNewUser && !isExistedUser) {
+      throw new Error("There is no member with such user name");
+      
     }
     
     await newRoom.save();
