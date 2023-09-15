@@ -1,7 +1,7 @@
 import { call, put, takeLatest } from "redux-saga/effects"
-import { CreateRoomPayload, createRoomApi, joinRoomApi } from "../api/RoomHandlerApi"
-import { createRoomAction, joinRoomAction } from "./Actions"
-import { RoomSliceState, fetchRoomDataFailure, joinRoom } from "../sliceFiles/RoomSlice"
+import { CreateRoomPayload, createRoomApi, getPublicRoomsApi, joinRoomApi } from "../api/RoomHandlerApi"
+import { createRoomAction, getPublicRoomsAction, joinRoomAction } from "./Actions"
+import { PublicRooms, RoomSliceState, addPublicRooms, fetchRoomDataFailure, joinRoom } from "../sliceFiles/RoomSlice"
 import { addNotification } from "../sliceFiles/Notification"
 import { Severity } from "../../utils/Notification"
 
@@ -38,8 +38,18 @@ function* joinRoomWorker (action: {payload: CreateRoomPayload}): Generator<unkno
         console.error('JOIN_ROOM_ERROR::', e)
     }
 }
+function* getPublicRoomsWorker (): Generator<unknown, void, PublicRooms[]> {
+    try {
+        const rooms = yield call(getPublicRoomsApi)
+        yield put(addPublicRooms(rooms))
+    } catch (e) {
+        yield put(fetchRoomDataFailure(e as string));
+        console.log('ERROR::', e)
+    }
+}
 
 export function* roomWatcher () {
+    yield takeLatest(getPublicRoomsAction, getPublicRoomsWorker);
     yield takeLatest(createRoomAction, createRooomWorker)
     yield takeLatest(joinRoomAction,joinRoomWorker )
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Socket } from 'socket.io-client';
 // import { useUserContext } from '../../../context/UserContext'
 import './styles.scss';
 import { HandleChangeProps } from '../models/AuthModels';
-import Card from '../../utils/reusable/Card';
+import Card from '../../utils/reusable/card/Card';
 import { Button } from '../../utils/reusable/styles/Design';
 import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
@@ -37,6 +37,7 @@ const getMessageType = (data: string ): string => {
 const renderFile = (msz: Message, className = '') => {
   switch (getMessageType(msz.type)) {
     case 'application/pdf':
+    case 'image/png': 
     case 'image/jpeg': {
       return (
         <div className={className} key={msz._id}>
@@ -52,12 +53,13 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
   const { messages } = state;
-  socket.off('new-message').on('new-message', (msz) => {
-    setTotalMessages((prev) => [...prev, msz]);
-  });
   const [totalMessages, setTotalMessages] = useState<Message[]>(
     messages.messages
   );
+  const lastMszRef = useRef<HTMLDivElement | null>(null)
+  socket.off('NEW_MESSAGE').on('NEW_MESSAGE', (msz) => {
+    setTotalMessages((prev) => [...prev, msz]);
+  });
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
@@ -67,13 +69,13 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
 
     if (msz.type === 'message') {
       return (
-        <div className={className} key={msz._id}>
+        <div ref={lastMszRef} className={className} key={msz._id}>
           <span className="author">{msz.from}:</span>{' '}
           <span className="content">{msz.content}</span>
         </div>
       );
     } else {
-      return renderFile(msz, className);
+      return  <div ref={lastMszRef}>{renderFile(msz, className)}</div>
     }
   };
 
@@ -103,22 +105,26 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
       fileId,
     };
     setMessage('');
-    setTotalMessages([...totalMessages, msz]);
-    socket.emit('add-message', msz);
+    socket.emit('ADD_MESSAGE', msz);
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleMessage();
   };
+  const scrollToBottom = () => {
+    lastMszRef.current?.scrollIntoView({behavior:'smooth', block:'center', inline:'center' })
+  }
   useEffect(() => {
     dispatch(getRoomMessages(userData.roomId));
   }, []);
   useEffect(() => {
     setTotalMessages(messages.messages);
   }, [messages.messages]);
+  useEffect(()=> {
+    scrollToBottom()
+  }, [totalMessages])
   return (
     <div className="chat-box">
       <div className="chat-header">
-        <span>&#8592;</span>
         <span> {userData.roomName || state.room.roomName}</span>
       </div>
       <div className="chat-body">

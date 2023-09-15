@@ -54,3 +54,12 @@ module.exports.joinRoom = async (req, res) => {
     res.status(401).json({ error: e.message });
   }
 };
+
+module.exports.publicRooms =async (req,res) => {
+  try {
+    const rooms = await RoomModel.find({isProtected: false})
+    res.status(200).json(rooms)
+  } catch (e) {
+    res.status(400).json({error: e.message})
+  }
+}
