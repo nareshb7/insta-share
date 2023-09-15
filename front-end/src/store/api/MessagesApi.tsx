@@ -1,20 +1,21 @@
-export const BE_URL = 'http://localhost:8081'
-export const getMessagesApi = async (): Promise<string[]> => {
-    return fetch(`${BE_URL}/getmessages`, {
+import { SendMessageType } from "../saga/Actions"
+
+export const BE_URL = "http://192.168.10.28:8081"
+export const getMessagesApi = async (id: string): Promise<string[]> => {
+    return fetch(`${BE_URL}/message/${id}`, {
         method:'GET',
     }).then(res => res.json())
     .then(data => data)
     .catch(err => err)
     // return dt
 }
-export const sendMessageAPi = async (message: string):Promise<string> => {
-    console.log('API::', message)
-    return fetch(`${BE_URL}/addMessage`, {
+export const sendMessageAPi = async (data: SendMessageType):Promise<string> => {
+    return fetch(`${BE_URL}/message/sendmessage`, {
         method:'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({message})
+        body: JSON.stringify({data})
     }).then(res => res.json())
     .then(data => data)
     .catch(err => err)

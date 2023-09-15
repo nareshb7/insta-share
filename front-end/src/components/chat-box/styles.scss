@@ -12,16 +12,18 @@
     .chat-body {
         height: 362px;
         overflow: hidden scroll;
-        .user-message::before {
-            content: 'You: ',
-        }
         .user-message , .opponent-message {
             margin-left: 5px;
             margin-block: 10px;
+            .download-icon {
+                color: blue;
+                border-bottom: 2px solid blue;
+            }
         }
-        .opponent-message::before {
-            content: 'Other: ';
-            color: #888;
+        .opponent-message {
+            .author {
+                color:#888
+            } 
         }
     }
     .chat-footer {
@@ -45,5 +47,22 @@
             border-radius: 8px;
         }
     }
-   
+}
+
+.emp-list {
+    h2 {
+        span {
+            color: #888
+        }
+    }
+    hr {
+        margin-inline: 10px;
+    }
+    h1 {
+        color: #444
+    }
+    .card {
+        margin-top: 10px;
+        margin-inline: 5px;
+    }
 }

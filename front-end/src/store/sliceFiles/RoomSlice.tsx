@@ -1,16 +1,21 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice,  PayloadAction } from "@reduxjs/toolkit";
 
+
+interface Users {
+    userName: string
+}
 export interface RoomSliceState {
     roomId: string,
     roomName: string,
     userName: string,
     isProtected: boolean,
-    users: string[],
+    users: Users[],
     messages: string[],
     password: string,
     createdAt: Date,
     isLoading: boolean,
-    error: string
+    error: string,
+    isSuccess: boolean
 }
 
 const initialState: RoomSliceState = {
@@ -23,7 +28,8 @@ const initialState: RoomSliceState = {
     password: '',
     createdAt: new Date(),
     isLoading: false,
-    error:''
+    error:'',
+    isSuccess: false
 }
 
 
@@ -33,22 +39,30 @@ const roomSlice = createSlice({
     reducers: {
         fetchRoomDataStart: (state)=> {
             state.isLoading= true
+            state.error = ''
         },
-        createRoom : (state, action) => {
+        joinRoom : (state, action: PayloadAction<RoomSliceState>) => {
+            const { isProtected, messages, roomId, roomName, userName, users, createdAt, password} = action.payload
             state.isLoading = false
-            state = action.payload
-        },
-        joinRoom : (state,action) => {
-            state.isLoading= false
-            state = action.payload
+            state.isSuccess = true
+            state.messages = messages
+            state.roomId = roomId
+            state.roomName = roomName
+            state.userName = userName
+            state.users = users
+            state.createdAt = createdAt
+            state.password = password
+            state.isProtected = isProtected  
         },
         fetchRoomDataFailure: (state, action) => {
             state.isLoading = false
             state.error = action.payload
-
+        },
+        updateSuccessState: (state)=> {
+            state.isSuccess = false
         }
     }
 })
 
-export const {createRoom, joinRoom, fetchRoomDataStart, fetchRoomDataFailure} = roomSlice.actions
+export const {joinRoom, fetchRoomDataStart, fetchRoomDataFailure, updateSuccessState} = roomSlice.actions
 export default roomSlice.reducer

@@ -1,16 +1,17 @@
 import { call, takeLatest, put} from 'redux-saga/effects'
-import { addNewMessage, assignMessages, sendNewMessage } from './Actions'
+import { SendMessageType, addNewMessage, assignMessages, getRoomMessages, sendNewMessage } from './Actions'
 import { getMessagesApi, sendMessageAPi } from '../api/MessagesApi';
+import { Message } from '../sliceFiles/MessagesSlice';
 
 
-function* getMessagesWorker (): Generator<unknown, void, string[]> {
-    const data = yield call(getMessagesApi)
+function* getMessagesWorker (action: { payload: string }): Generator<unknown, void, Message[]> {
+    const data: Message[] = yield call(getMessagesApi, action.payload)
     yield put(assignMessages(data))
 }
 
-function* sendMessageWorker(action: { payload: string }) {
+function* sendMessageWorker(action: { payload: SendMessageType }) {
     try {
-      const data: string = yield call(sendMessageAPi, action.payload);
+      const data: Message = yield call(sendMessageAPi, action.payload);
       yield put(addNewMessage(data));
     } catch (error) {
       console.error('Error sending message:', error);
@@ -18,6 +19,6 @@ function* sendMessageWorker(action: { payload: string }) {
   }
 
 export function* messagesWatcher () {
-    yield takeLatest('GET_ROOM_MESSAGES', getMessagesWorker)
+    yield takeLatest(getRoomMessages, getMessagesWorker)
     yield takeLatest(sendNewMessage, sendMessageWorker)
 }
