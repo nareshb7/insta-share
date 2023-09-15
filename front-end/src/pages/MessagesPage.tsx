@@ -25,8 +25,9 @@ const MessagesPage = () => {
           isProtected: userContext.userData.isProtected || false,
         })
       );
-      userContext.socket.emit('JOIN_ROOM', userContext.userData.roomId)
     }
+    if (userContext !== null)
+    userContext.socket.emit('JOIN_ROOM', userContext.userData.roomId)
   }, []);
   useEffect(() => {
     if (state.room.error) {

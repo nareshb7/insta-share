@@ -8,6 +8,6 @@ const messageSchema = new mongoose.Schema({
     date: String,
     type:String,
     fileId: String
-})
+}, {timestamps: true})
 
 module.exports = MessageModel = new mongoose.model('message', messageSchema)

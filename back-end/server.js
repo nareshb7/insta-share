@@ -35,6 +35,7 @@ const io = new Server(server, {
   },
 });
 io.on("connection", async (socket) => {
+  console.log('SOCKET::', socket.handshake.address)
   socket.on("ADD_MESSAGE",async (message) => {
     const newMessage = new MessageModel(message);
     await newMessage.save();

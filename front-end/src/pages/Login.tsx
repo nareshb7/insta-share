@@ -33,7 +33,7 @@ const Login = () => {
   });
   const [isProtected, setIsProtected] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
-  const [isNewUser, setIsNewUser] = useState<boolean>(true);
+  const [isNewUser, setIsNewUser] = useState<boolean>(false);
 
   useEffect(() => {
     if (isSuccess) {
@@ -163,12 +163,13 @@ const Login = () => {
               </label>
               {!isNewRoom && (
                 <div>
-                  <label>
+                  <label style={{color: roomState.error.includes('Someone has') ? '#f00': ''}}>
                     If you are new user click here
                     <input
                       checked={isNewUser}
                       onChange={(e) => setIsNewUser(e.target.checked)}
                       type="checkbox"
+                      style={{color: roomState.error.includes('Someone has') ? '#f00': ''}}
                     />
                   </label>
                 </div>
@@ -189,20 +190,21 @@ const Login = () => {
               </label>
               <div className="error-message">{errorMessage.roomId}</div>
             </div>
-            {isNewRoom && (
-              <div>
-                <label>
-                  <input
-                    className="form-control"
-                    name="roomName"
-                    value={userData.roomName}
-                    onChange={handleChange}
-                    placeholder="Enter room name..."
-                  />
-                </label>
-                <div className="error-message">{errorMessage.roomName}</div>
-              </div>
-            )}
+            <div>
+              <label>
+                <input
+                  className="form-control"
+                  name="roomName"
+                  value={userData.roomName}
+                  onChange={handleChange}
+                  placeholder="Enter room name..."
+                  onBlur={handleValidate}
+                  onKeyUp={handleValidate}
+                  disabled={!isNewRoom}
+                />
+              </label>
+              <div className="error-message">{errorMessage.roomName}</div>
+            </div>
             <div>
               <label>
                 {isNewRoom
@@ -238,7 +240,11 @@ const Login = () => {
       </div>
       <div className='public-rooms'>
         <h2>Public Rooms:</h2>
-        <Card data={roomState.publicRooms} render={roomsRender}/>
+        {
+        roomState.publicRooms.length > 0 ? 
+        <Card data={roomState.publicRooms} render={roomsRender}/>: 
+        <h5>No PUBLIC_ROOMS AVAILABLE</h5>
+        }
       </div>
     </div>
   );
