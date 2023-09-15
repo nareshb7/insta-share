@@ -35,14 +35,12 @@ const io = new Server(server, {
   },
 });
 io.on("connection", async (socket) => {
-  console.log("SOCKET::", socket.id);
-  socket.on("add-message",async (message) => {
+  socket.on("ADD_MESSAGE",async (message) => {
     const newMessage = new MessageModel(message);
     await newMessage.save();
-    socket.broadcast.emit('new-message', newMessage)
+    io.to(message.to).emit('NEW_MESSAGE', newMessage)
   });
-  socket.on("join-room", async (roomId) => {
-    console.log('JOINED_ROOM::', roomId)
+  socket.on("JOIN_ROOM", async (roomId) => {
     socket.join(roomId);
   });
 });

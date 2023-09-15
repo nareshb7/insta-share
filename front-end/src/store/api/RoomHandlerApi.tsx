@@ -37,3 +37,10 @@ export const joinRoomApi =async (params: CreateRoomPayload): Promise<RoomSliceSt
     .then(data => data)
     .catch(err => err)
 }
+export const getPublicRoomsApi = async () => {
+    return fetch(`${BE_URL}/room/publicrooms`, {
+        method:'GET',
+    }).then(res => res.json())
+    .then(data => data)
+    .catch(err => err)
+}

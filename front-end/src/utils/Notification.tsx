@@ -14,12 +14,15 @@ export interface NotificationProps {
 
 const Notification = ({content, severity}: NotificationProps) => {
     const dispatch = useDispatch()
+    const handleClose = () => {
+        dispatch(removeNotifcation())
+    }
     useEffect(() => {
         setTimeout(()=> {
             dispatch(removeNotifcation())
         }, 5000)
     }, [])
-    return <div className={`notification ${severity}`}>{content} <span className="icon"> &#9432;</span></div>
+    return <div className={`notification ${severity}`}>{content} <span className="icon"> &#9432; <span className="close-icon" onClick={handleClose}> X </span> </span> </div>
 }
 
 export default Notification

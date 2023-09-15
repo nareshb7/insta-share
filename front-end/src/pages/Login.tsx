@@ -6,12 +6,16 @@ import { Button } from '../utils/reusable/styles/Design';
 import { UserData } from '../context/Models';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
-import { createRoomAction, joinRoomAction } from '../store/saga/Actions';
+import { createRoomAction, getPublicRoomsAction, joinRoomAction } from '../store/saga/Actions';
 import {
+  PublicRooms,
   fetchRoomDataFailure,
   fetchRoomDataStart,
 } from '../store/sliceFiles/RoomSlice';
 import { RootState } from '../store/Store';
+import Card from '../utils/reusable/card/Card';
+import { addNotification } from '../store/sliceFiles/Notification';
+import { Severity } from '../utils/Notification';
 
 const Login = () => {
   const userContext = useUserContext();
@@ -22,7 +26,6 @@ const Login = () => {
   const [isNewRoom, setNewRoom] = useState<boolean>(true);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [btnDisable, setBtnDisable] = useState<boolean>(true);
-  const [roomName, setRoomName] = useState('');
   const [errorMessage, setErrorMessage] = useState<UserData>({
     userName: '',
     roomName: '',
@@ -38,6 +41,9 @@ const Login = () => {
       navigate('/messages');
     }
   }, [isSuccess]);
+  useEffect(()=> {
+    dispatch(getPublicRoomsAction())
+  }, [])
 
   if (userContext === null) {
     // Handle the case where the context is null
@@ -65,6 +71,14 @@ const Login = () => {
     } else {
       setErrorMessage((prev) => ({ ...prev, roomId: '' }));
     }
+    if (isNewRoom) {
+      if (!userData.roomName) {
+        setErrorMessage((prev) => ({ ...prev, roomName: 'Room Name required' }));
+        count++;
+      } else {
+        setErrorMessage((prev) => ({ ...prev, roomName: '' }));
+      }
+    }
     if (count) setBtnDisable(true);
     else setBtnDisable(false);
     return count === 0 ? true : false;
@@ -72,7 +86,7 @@ const Login = () => {
 
   const handleJoin = () => {
     dispatch(fetchRoomDataStart());
-    userData.roomName = roomName;
+    // userData.roomName = roomName;
     userData.isProtected = isProtected;
     userData.password = password;
     if (isNewRoom) {
@@ -96,7 +110,6 @@ const Login = () => {
     setErrorMessage(emptyObejct);
     setUserData(emptyObejct);
     setIsProtected(false);
-    setRoomName('');
     setPassword('');
     dispatch(fetchRoomDataFailure(''));
   };
@@ -104,6 +117,28 @@ const Login = () => {
     setIsProtected(!isProtected);
     setPassword('');
   };
+  const handlePublicRoomClick = (room: PublicRooms) => {
+    const name = window.prompt('Enter your name??')
+    if (name) {
+      const obj = {userName: name, roomId: room.roomId, roomName: room.roomName}
+      setUserData(obj)
+      setNewRoom(false);
+      setShowForm(true);
+      setBtnDisable(false)
+      dispatch(
+        joinRoomAction({ ...obj, isProtected, password, isNewUser })
+      );
+      console.log('ROOM_CLICKED::', room, name, userData, isProtected, isNewUser,password)
+    } else {
+      dispatch(addNotification({
+        content: 'Name Required',
+        severity: Severity.ERROR
+      }))
+    }
+  }
+  const roomsRender = (data: PublicRooms) => (
+    <h5 key={data._id} onClick={() => handlePublicRoomClick(data)}>{data.roomName}</h5>
+  )
   return (
     <div className="auth-page">
       <div className="login-page">
@@ -160,11 +195,12 @@ const Login = () => {
                   <input
                     className="form-control"
                     name="roomName"
-                    value={roomName}
-                    onChange={(e) => setRoomName(e.target.value)}
+                    value={userData.roomName}
+                    onChange={handleChange}
                     placeholder="Enter room name..."
                   />
                 </label>
+                <div className="error-message">{errorMessage.roomName}</div>
               </div>
             )}
             <div>
@@ -199,6 +235,10 @@ const Login = () => {
             <div className="error-message">{roomState.error}</div>
           </div>
         )}
+      </div>
+      <div className='public-rooms'>
+        <h2>Public Rooms:</h2>
+        <Card data={roomState.publicRooms} render={roomsRender}/>
       </div>
     </div>
   );

@@ -50,6 +50,9 @@
 }
 
 .emp-list {
+    .room-user {
+        margin-bottom: 10px;
+    }
     h2 {
         span {
             color: #888
@@ -64,5 +67,11 @@
     .card {
         margin-top: 10px;
         margin-inline: 5px;
+    }
+    .room-info {
+        padding: 5px;
+        h4 {
+            margin-bottom: 5px;
+        }
     }
 }

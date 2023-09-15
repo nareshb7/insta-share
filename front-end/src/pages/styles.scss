@@ -35,10 +35,22 @@
 }
 
 .auth-page {
+    display: flex;
+    justify-content: space-around;
     .login-page {
         display: flex;
         align-items: center;
         flex-direction: column;
+        width: 50%
+    }
+    .public-rooms {
+        .card {
+            border: 1px solid #eee;
+            .card-item {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
     }
 }
 .chat-main {

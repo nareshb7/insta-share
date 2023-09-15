@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles.scss'
 
 // Define a generic CardProps interface
 interface CardProps<T> {
