@@ -68,3 +68,10 @@ module.exports.downloadFile  = async (req,res) => {
         res.status(200).json({error: e.message})
     }
 }
+module.exports.deleteFile = async (req,res) => {
+    try {
+        res.status(200).json(req.body)
+    } catch (e) {
+        res.status(200).json({error: e.message})
+    }
+}

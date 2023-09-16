@@ -6,6 +6,7 @@ const upload = multer({ storage });
 
 router.get('/:id',downloadFile)
 router.post("/",upload.single('file'), uploadFile)
+router.delete('/:id', deleteFile)
 
 
 module.exports = router

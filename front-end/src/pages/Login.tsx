@@ -148,7 +148,7 @@ const Login = () => {
         </div>
         {showForm && (
           <div>
-            {isNewRoom ? <h4>Create New Room: </h4> : <h4>Enter Room Id: </h4>}
+            {isNewRoom ? <h4>Create New Room: </h4> : <h4>Enter Room Data: </h4>}
             <div>
               <label>
                 <input

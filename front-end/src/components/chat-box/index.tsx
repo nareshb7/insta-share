@@ -10,7 +10,7 @@ import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
 import { RootState } from '../../store/Store';
 import { Message } from '../../store/sliceFiles/MessagesSlice';
-import { fileDownload, fileUpload } from '../../store/api/FileUploadApi';
+import { deleteMessage, fileDownload, fileUpload } from '../../store/api/FileUploadApi';
 import { addNotification } from '../../store/sliceFiles/Notification';
 import { Severity } from '../../utils/Notification';
 
@@ -76,13 +76,27 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
+  const handleDeleteMessage = async(msz: Message)=> {
+    const cnfrm = window.confirm('Do u want to delete this msz??')
+    if (cnfrm) {
+      const res = await deleteMessage(msz._id)
+      if (res.error) {
+        dispatch(addNotification({
+          content: 'Deleting Error',
+          severity: Severity.ERROR
+        }))
+      } 
+      console.log('Deleted Sucess')
+      
+    }
+  }
   const messageRender = (msz: Message) => {
     const className =
       msz.from === userData.userName ? 'user-message' : 'opponent-message';
 
     if (msz.type === 'message') {
       return (
-        <div ref={lastMszRef} className={className} key={msz._id}>
+        <div ref={lastMszRef} className={className} key={msz._id} onClick={()=> handleDeleteMessage(msz)}>
           <span className="author">{msz.from}:</span>{' '}
           <span className="content">{msz.content}</span>
           <span className="time-indicator">
@@ -92,7 +106,7 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
         </div>
       );
     } else {
-      return <div ref={lastMszRef}>{renderFile(msz, className)}</div>;
+      return <div ref={lastMszRef} onClick={()=> handleDeleteMessage(msz)}>{renderFile(msz, className)}</div>;
     }
   };
 

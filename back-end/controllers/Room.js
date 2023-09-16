@@ -22,7 +22,7 @@ module.exports.createRoom = async (req, res) => {
 module.exports.joinRoom = async (req, res) => {
   try {
     const { params } = req.body;
-    console.log("JOIN_ROOM::", params);
+    console.log("JOIN_ROOM::", params, req.url);
     const newRoom = await RoomModel.findOne({ roomId: params.roomId });
     if (!newRoom) {
       throw new Error("Room Id not found");
