@@ -10,9 +10,10 @@ import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
 import { RootState } from '../../store/Store';
 import { Message } from '../../store/sliceFiles/MessagesSlice';
-import { deleteMessage, fileDownload, fileUpload } from '../../store/api/FileUploadApi';
+import { fileDownload, fileUpload } from '../../store/api/FileUploadApi';
 import { addNotification } from '../../store/sliceFiles/Notification';
 import { Severity } from '../../utils/Notification';
+// import { deleteMessage } from '../../store/api/MessagesApi';
 
 interface ChatBoxProps {
   userData: UserData;
@@ -73,19 +74,26 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   socket.off('NEW_MESSAGE').on('NEW_MESSAGE', (msz) => {
     setTotalMessages((prev) => [...prev, msz]);
   });
+  socket.off('MESSAGE_DELETED').on('MESSAGE_DELETED', (file) => {
+    // setTotalMessages((prev) => [...prev, msz]);
+    const messages = totalMessages.filter(msz => msz._id != file._id)
+    console.log('MESSAGE:"DELETED::',{file, messages, totalMessages} )
+    setTotalMessages(messages)
+  });
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
   const handleDeleteMessage = async(msz: Message)=> {
     const cnfrm = window.confirm('Do u want to delete this msz??')
     if (cnfrm) {
-      const res = await deleteMessage(msz._id)
-      if (res.error) {
-        dispatch(addNotification({
-          content: 'Deleting Error',
-          severity: Severity.ERROR
-        }))
-      } 
+      // const res = await deleteMessage(msz._id)
+      // if (res.error) {
+      //   dispatch(addNotification({
+      //     content: 'Deleting Error',
+      //     severity: Severity.ERROR
+      //   }))
+      // } 
+      socket.emit('DELETE_MESSAGE', msz._id)
       console.log('Deleted Sucess')
       
     }
@@ -96,7 +104,7 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
 
     if (msz.type === 'message') {
       return (
-        <div ref={lastMszRef} className={className} key={msz._id} onClick={()=> handleDeleteMessage(msz)}>
+        <div ref={lastMszRef} className={className} key={msz._id} onDoubleClick={()=> handleDeleteMessage(msz)}>
           <span className="author">{msz.from}:</span>{' '}
           <span className="content">{msz.content}</span>
           <span className="time-indicator">
@@ -106,7 +114,7 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
         </div>
       );
     } else {
-      return <div ref={lastMszRef} onClick={()=> handleDeleteMessage(msz)}>{renderFile(msz, className)}</div>;
+      return <div ref={lastMszRef} onDoubleClick={()=> handleDeleteMessage(msz)}>{renderFile(msz, className)}</div>;
     }
   };
 

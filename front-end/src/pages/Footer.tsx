@@ -19,7 +19,7 @@ const Footer = () => {
           </div>
         </div>
     </div>
-    <div className='copyright-tag'> &#169; Developed by Naresh Baleboina</div>
+    <div className='copyright-tag'> Copyright 2023 &#169; Developed by Naresh Baleboina. All Rights Reserved </div>
     </div>
   )
 }

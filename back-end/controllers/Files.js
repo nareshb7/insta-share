@@ -34,7 +34,6 @@ const FileModel = new mongoose.model('files', fileSchema)
 module.exports.uploadFile = async (req,res) => {
     try {
         const { originalname, buffer, size, mimetype } = req.file;
-        console.log('FILE::', req.file)
         if (!supportedFormats.find((val) => val.includes(mimetype))) {
             throw new Error('Invalid format')
         }
@@ -60,17 +59,9 @@ module.exports.uploadFile = async (req,res) => {
 }
 module.exports.downloadFile  = async (req,res) => {
     try {
-        console.log('DOWNLOAD::', req.query, req.params)
         const {id} = req.params
         const file = await FileModel.findOne({_id: id})
         res.status(200).json(file)
-    } catch (e) {
-        res.status(200).json({error: e.message})
-    }
-}
-module.exports.deleteFile = async (req,res) => {
-    try {
-        res.status(200).json(req.body)
     } catch (e) {
         res.status(200).json({error: e.message})
     }

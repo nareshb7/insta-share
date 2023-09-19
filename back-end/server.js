@@ -44,6 +44,11 @@ io.on("connection", async (socket) => {
   socket.on("JOIN_ROOM", async (roomId) => {
     socket.join(roomId);
   });
+  socket.on('DELETE_MESSAGE', async (id) => {
+    const file = await MessageModel.findByIdAndDelete({_id: id})
+    console.log('DELETE:', file, id)
+    socket.emit('MESSAGE_DELETED', file)
+  })
 });
 
 server.listen(PORT, () => {

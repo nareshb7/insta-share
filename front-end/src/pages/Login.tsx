@@ -128,6 +128,7 @@ const Login = () => {
       dispatch(
         joinRoomAction({ ...obj, isProtected, password, isNewUser })
       );
+      localStorage.setItem('file-share-user', JSON.stringify(obj));
       console.log('ROOM_CLICKED::', room, name, userData, isProtected, isNewUser,password)
     } else {
       dispatch(addNotification({

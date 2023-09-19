@@ -21,3 +21,13 @@ module.exports.newMessage = async (req, res) => {
     res.status(401).json({ error: e.message });
   }
 };
+
+module.exports.deleteFile = async (req,res) => {
+  try {
+      const {id} = req.params
+      const deleteFile = await MessageModel.findByIdAndDelete({_id: id})
+      res.status(200).json(req.body)
+  } catch (e) {
+      res.status(200).json({error: e.message})
+  }
+}

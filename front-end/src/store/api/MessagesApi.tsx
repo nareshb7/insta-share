@@ -21,6 +21,13 @@ export const sendMessageAPi = async (data: SendMessageType):Promise<string> => {
     .catch(err => err)
 }
 
+export const deleteMessage = async (id: string = '') => {
+    return fetch(`${BE_URL}/message/${id}`, {
+        method:'DELETE',
+    }).then(res => res.json())
+    .then(data => data)
+    .catch(err => err)
+}
 
 
 
