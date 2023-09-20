@@ -29,7 +29,7 @@ const EmpList = ({ userData, roomData }: EmpListProps) => {
           <h4>RoomName : {roomData.roomName}</h4>
           <h4>RoomId : {roomData.roomId}</h4>
           <h4>Room Members: {roomData.users.length}</h4>
-          <h4>Room Owner: {roomData.userName}</h4>
+          <h4>Room Owner: {roomData.ownerName}</h4>
           <h4>Created On: {new Date(roomData.createdAt).toLocaleString()}</h4>
         </div>
       ) : (

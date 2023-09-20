@@ -8,16 +8,17 @@ import Card from '../../utils/reusable/card/Card';
 import { Button } from '../../utils/reusable/styles/Design';
 import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
-import { RootState } from '../../store/Store';
-import { Message } from '../../store/sliceFiles/MessagesSlice';
+import { Message, MessageSlice } from '../../store/sliceFiles/MessagesSlice';
 import { fileDownload, fileUpload } from '../../store/api/FileUploadApi';
 import { addNotification } from '../../store/sliceFiles/Notification';
 import { Severity } from '../../utils/Notification';
+import { RoomSliceState } from '../../store/sliceFiles/RoomSlice';
 // import { deleteMessage } from '../../store/api/MessagesApi';
 
 interface ChatBoxProps {
   userData: UserData;
-  state: RootState;
+  room: RoomSliceState;
+  messages: MessageSlice;
   socket: Socket;
 }
 const getFileFromDb = async (id: string = '') => {
@@ -63,10 +64,9 @@ const renderFile = (msz: Message, className = '') => {
       );
   }
 };
-const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
+const ChatBox = ({ userData ,messages, room, socket }: ChatBoxProps) => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
-  const { messages } = state;
   const [totalMessages, setTotalMessages] = useState<Message[]>(
     messages.messages
   );
@@ -75,36 +75,41 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
     setTotalMessages((prev) => [...prev, msz]);
   });
   socket.off('MESSAGE_DELETED').on('MESSAGE_DELETED', (file) => {
-    // setTotalMessages((prev) => [...prev, msz]);
-    const messages = totalMessages.filter(msz => msz._id != file._id)
-    console.log('MESSAGE:"DELETED::',{file, messages, totalMessages} )
-    setTotalMessages(messages)
+    const messages = totalMessages.filter((msz) => msz._id != file._id);
+    setTotalMessages(messages);
+    dispatch(addNotification({
+      content: "Message deleted",
+      severity: Severity.SUCCESS
+    }))
   });
   const handleChange = (e: HandleChangeProps) => {
     setMessage(e.target.value);
   };
-  const handleDeleteMessage = async(msz: Message)=> {
-    const cnfrm = window.confirm('Do u want to delete this msz??')
-    if (cnfrm) {
-      // const res = await deleteMessage(msz._id)
-      // if (res.error) {
-      //   dispatch(addNotification({
-      //     content: 'Deleting Error',
-      //     severity: Severity.ERROR
-      //   }))
-      // } 
-      socket.emit('DELETE_MESSAGE', msz._id)
-      console.log('Deleted Sucess')
-      
+  const handleDeleteMessage = async (msz: Message) => {
+    if (userData.userName === msz.from || userData.userName === room.ownerName) {
+      const cnfrm = window.confirm('Do u want to delete this msz??');
+      if (cnfrm) {
+        socket.emit('DELETE_MESSAGE', msz._id);
+      }
+    } else {
+        dispatch(addNotification({
+            content: "U can't delete other's message...",
+            severity: Severity.ERROR
+          }))
     }
-  }
+  };
   const messageRender = (msz: Message) => {
     const className =
       msz.from === userData.userName ? 'user-message' : 'opponent-message';
 
     if (msz.type === 'message') {
       return (
-        <div ref={lastMszRef} className={className} key={msz._id} onDoubleClick={()=> handleDeleteMessage(msz)}>
+        <div
+          ref={lastMszRef}
+          className={className}
+          key={msz._id}
+          onDoubleClick={() => handleDeleteMessage(msz)}
+        >
           <span className="author">{msz.from}:</span>{' '}
           <span className="content">{msz.content}</span>
           <span className="time-indicator">
@@ -114,7 +119,11 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
         </div>
       );
     } else {
-      return <div ref={lastMszRef} onDoubleClick={()=> handleDeleteMessage(msz)}>{renderFile(msz, className)}</div>;
+      return (
+        <div ref={lastMszRef} onDoubleClick={() => handleDeleteMessage(msz)}>
+          {renderFile(msz, className)}
+        </div>
+      );
     }
   };
 
@@ -168,7 +177,7 @@ const ChatBox = ({ userData, state, socket }: ChatBoxProps) => {
   return (
     <div className="chat-box">
       <div className="chat-header">
-        <span> {userData.roomName || state.room.roomName}</span>
+        <span> {userData.roomName || room.roomName}</span>
       </div>
       <div className="chat-body">
         <Card data={totalMessages} render={messageRender} />

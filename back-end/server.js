@@ -45,9 +45,12 @@ io.on("connection", async (socket) => {
     socket.join(roomId);
   });
   socket.on('DELETE_MESSAGE', async (id) => {
-    const file = await MessageModel.findByIdAndDelete({_id: id})
-    console.log('DELETE:', file, id)
-    socket.emit('MESSAGE_DELETED', file)
+    try {
+      const file = await MessageModel.findByIdAndDelete({_id: id})
+      socket.emit('MESSAGE_DELETED', file)
+    } catch (e) {
+      socket.emit('errorEvent', {message: 'Delete Error Occured', error: e.message})
+    }
   })
 });
 

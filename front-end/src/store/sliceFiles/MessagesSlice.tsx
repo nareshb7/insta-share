@@ -12,7 +12,7 @@ export interface Message {
   createdAt?: Date
 }
 
-interface MessageSlice {
+export interface MessageSlice {
   messages: Message[];
   roomId: string;
   roomMembers: string[];

@@ -11,7 +11,7 @@ const roomSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userName: {
+    ownerName: {
       required: true,
       type: String,
     },

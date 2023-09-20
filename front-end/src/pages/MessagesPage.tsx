@@ -11,11 +11,12 @@ import { Link } from 'react-router-dom';
 const MessagesPage = () => {
   const userContext = useUserContext();
   const dispatch = useDispatch();
-  const state = useSelector((state: RootState) => state);
+  const messages = useSelector((state: RootState) => state.messages);
+  const room = useSelector((state: RootState) => state.room)
   const [errorMessage, setErrorMessage] = useState<string>('');
   useEffect(() => {
     if (
-      !state.room.roomId &&
+      !room.roomId &&
       userContext !== null &&
       userContext.userData.roomId
     ) {
@@ -30,10 +31,10 @@ const MessagesPage = () => {
     userContext.socket.emit('JOIN_ROOM', userContext.userData.roomId)
   }, []);
   useEffect(() => {
-    if (state.room.error) {
-      setErrorMessage(state.room.error);
+    if (room.error) {
+      setErrorMessage(room.error);
     }
-  }, [state.room.error]);
+  }, [room.error]);
   if (userContext === null) {
     // Handle the case where the context is null
     return <div>Loading...</div>; // or some other fallback
@@ -42,10 +43,10 @@ const MessagesPage = () => {
   return (
     <>
       {' '}
-      {state.room.isSuccess ? (
+      {room.isSuccess ? (
         <div className="chat-main">
-          <EmpList userData={userData} roomData={state.room} />
-          <ChatBox userData={userData} state={state} socket={socket} />
+          <EmpList userData={userData} roomData={room} />
+          <ChatBox userData={userData} messages={messages} room={room} socket={socket} />
         </div>
       ) : (
         <div className='chat-error-page'>
