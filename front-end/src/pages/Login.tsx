@@ -161,6 +161,22 @@ const Login = () => {
                   onKeyUp={handleValidate}
                 />
               </label>
+              {
+                isNewRoom && <div><label>
+                <input
+                  className="form-control"
+                  name="userPassword"
+                  value={userData.userPassword}
+                  onChange={handleChange}
+                  placeholder="Enter your password..."
+                  onBlur={handleValidate}
+                  onKeyUp={handleValidate}
+                />
+              </label>
+              <p className='info-message'>U need to pass this password with username when u r logging in </p>
+              <p>like test;123</p>
+              </div>
+              }
               {!isNewRoom && (
                 <div>
                   <label style={{color: roomState.error.includes('Someone has') ? '#f00': ''}}>
@@ -243,7 +259,7 @@ const Login = () => {
         {
         roomState.publicRooms.length > 0 ? 
         <Card data={roomState.publicRooms} render={roomsRender}/>: 
-        <h5>No PUBLIC_ROOMS AVAILABLE</h5>
+        <h5>NO PUBLIC_ROOMS AVAILABLE</h5>
         }
       </div>
     </div>

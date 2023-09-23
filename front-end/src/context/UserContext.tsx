@@ -19,7 +19,8 @@ const UserContext = ({ children }: UserContextProps) => {
   const prevUser : UserData = storedValue ? JSON.parse(storedValue) : {
     userName: '',
     roomName: '',
-    roomId:''
+    roomId:'',
+    userPassword:''
   }
   const [userData, setUserData] = useState<UserData>(prevUser)
   const [users,setUsers] = useState<UserData[]>([])

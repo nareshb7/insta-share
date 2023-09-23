@@ -5,7 +5,7 @@ module.exports.createRoom = async (req, res) => {
   try {
     const { params } = req.body;
     console.log("CREATE_ROOM::", params);
-    const newRoom = new RoomModel({ ...params });
+    const newRoom = new RoomModel({ ...params, ownerName: params.userName, ownerPassword: params.userPassword });
 
     newRoom.users.push({ userName: params.userName });
     await newRoom.save();
@@ -35,7 +35,13 @@ module.exports.joinRoom = async (req, res) => {
         throw new Error("Room password not matching");
       }
     }
-    const isExistedUser = newRoom.users.find(val => val.userName === params.userName)
+    const isExistedUser = newRoom.users.find(val => val.userName === params.userName.split(';')[0])
+    if (isExistedUser && newRoom.ownerName === params.userName.split(';')[0]) {
+      const ownerPassword = params.userName.split(';')[1]
+      if (ownerPassword !== newRoom.ownerPassword) {
+        throw new Error("Owner account needs password to login");
+      }
+    }
     if (isExistedUser && params.isNewUser) {
       throw new Error("Someone has already joined with same User name");
     } else if (params.isNewUser && !isExistedUser) {

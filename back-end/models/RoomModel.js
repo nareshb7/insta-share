@@ -19,6 +19,10 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    ownerPassword: {
+      type: String,
+      required: true
+    },
     users: {
       type: Array,
       default: [],

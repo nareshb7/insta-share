@@ -18,6 +18,7 @@ export interface RoomSliceState {
     roomId: string,
     roomName: string,
     ownerName: string,
+    ownerPassword: string;
     isProtected: boolean,
     users: Users[],
     messages: string[],
@@ -41,7 +42,8 @@ const initialState: RoomSliceState = {
     isLoading: false,
     error:'',
     isSuccess: false,
-    publicRooms: []
+    publicRooms: [],
+    ownerPassword: '',
 }
 
 
@@ -54,7 +56,7 @@ const roomSlice = createSlice({
             state.error = ''
         },
         joinRoom : (state, action: PayloadAction<RoomSliceState>) => {
-            const { isProtected, messages, roomId, roomName, ownerName, users, createdAt, password} = action.payload
+            const { isProtected, messages, roomId, roomName, ownerName, users, createdAt, password, ownerPassword} = action.payload
             state.isLoading = false
             state.isSuccess = true
             state.messages = messages
@@ -65,6 +67,7 @@ const roomSlice = createSlice({
             state.createdAt = createdAt
             state.password = password
             state.isProtected = isProtected  
+            state.ownerPassword = ownerPassword
         },
         addPublicRooms: (state, action:  PayloadAction<PublicRooms[]>) => {
             state.publicRooms = action.payload

@@ -7,6 +7,7 @@ export interface UserData {
     roomId: string
     isProtected?: boolean
     password?: string
+    userPassword?: string 
   }
 export interface ContextState {
     userData: UserData
