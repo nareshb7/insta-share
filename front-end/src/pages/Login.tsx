@@ -120,7 +120,7 @@ const Login = () => {
   const handlePublicRoomClick = (room: PublicRooms) => {
     const name = window.prompt('Enter your name??')
     if (name) {
-      const obj = {userName: name, roomId: room.roomId, roomName: room.roomName}
+      const obj = {userName: name.split(';')[0], roomId: room.roomId, roomName: room.roomName}
       setUserData(obj)
       setNewRoom(false);
       setShowForm(true);

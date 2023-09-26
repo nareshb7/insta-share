@@ -186,7 +186,7 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
     }
     const msz: Message = {
       content,
-      from: userData.userName,
+      from: userData.userName.split(';')[0],
       to: userData.roomId,
       type,
       fileId,

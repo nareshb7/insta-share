@@ -14,7 +14,7 @@ const EmpList = ({ userData, roomData }: EmpListProps) => {
   return (
     <div className="emp-list">
       <h2 className='room-user'>
-        User: <span style={{ color: '#888' }}>{userData.userName}</span>
+        User: <span style={{ color: '#888' }}>{userData.userName.split(';')[0]}</span>
       </h2>
       <hr />
       <h1 style={{ color: '#444' }}>Room Data: </h1>
