@@ -9,9 +9,10 @@ export interface Message {
   __v?: string;
   _id?: string;
   fileId?: string;
+  createdAt?: Date
 }
 
-interface MessageSlice {
+export interface MessageSlice {
   messages: Message[];
   roomId: string;
   roomMembers: string[];

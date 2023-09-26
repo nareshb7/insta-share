@@ -35,6 +35,7 @@ const io = new Server(server, {
   },
 });
 io.on("connection", async (socket) => {
+  console.log('SOCKET::', socket.handshake.address)
   socket.on("ADD_MESSAGE",async (message) => {
     const newMessage = new MessageModel(message);
     await newMessage.save();
@@ -43,6 +44,14 @@ io.on("connection", async (socket) => {
   socket.on("JOIN_ROOM", async (roomId) => {
     socket.join(roomId);
   });
+  socket.on('DELETE_MESSAGE', async (id) => {
+    try {
+      const file = await MessageModel.findByIdAndDelete({_id: id})
+      socket.emit('MESSAGE_DELETED', file)
+    } catch (e) {
+      socket.emit('errorEvent', {message: 'Delete Error Occured', error: e.message})
+    }
+  })
 });
 
 server.listen(PORT, () => {

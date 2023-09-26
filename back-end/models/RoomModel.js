@@ -11,13 +11,17 @@ const roomSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userName: {
+    ownerName: {
       required: true,
       type: String,
     },
     isProtected: {
       type: Boolean,
       default: false,
+    },
+    ownerPassword: {
+      type: String,
+      required: true
     },
     users: {
       type: Array,

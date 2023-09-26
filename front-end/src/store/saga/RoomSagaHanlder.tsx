@@ -18,10 +18,11 @@ function* createRooomWorker (action: {payload: CreateRoomPayload}): Generator<un
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e : any) {
+        yield put(addNotification({content: e.error, severity: Severity.ERROR}))
         yield put(fetchRoomDataFailure(e as string));
-        console.error('CREATE_ROOM_ERROR::', e.Error);
     }
 }
+
 function* joinRoomWorker (action: {payload: CreateRoomPayload}): Generator<unknown, void, RoomSliceState> {
     try {
         const data = yield call(joinRoomApi, action.payload)
@@ -31,20 +32,21 @@ function* joinRoomWorker (action: {payload: CreateRoomPayload}): Generator<unkno
         } else if (data.roomId) {
             yield put(joinRoom(data))
         }
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
+        yield put(addNotification({content: e.error, severity: Severity.ERROR}))
         yield put(fetchRoomDataFailure(e as string));
-        console.error('JOIN_ROOM_ERROR::', e)
     }
 }
+
 function* getPublicRoomsWorker (): Generator<unknown, void, PublicRooms[]> {
     try {
         const rooms = yield call(getPublicRoomsApi)
         yield put(addPublicRooms(rooms))
-    } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        yield put(addNotification({content: e.error, severity: Severity.ERROR}))
         yield put(fetchRoomDataFailure(e as string));
-        console.log('ERROR::', e)
     }
 }
 
