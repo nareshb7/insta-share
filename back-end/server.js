@@ -9,6 +9,7 @@ const roomRoutes = require("./routes/RoomRoutes");
 const messageRoutes = require("./routes/MessageRoutes");
 const fileRoutes = require('./routes/Files')
 const MessageModel = require("./models/MessageModel");
+const { RoomModel } = require("./models/RoomModel");
 
 const app = express();
 app.use(cors());
@@ -34,6 +35,7 @@ const io = new Server(server, {
     method: ["GET", "POST"],
   },
 });
+const liveChatObject = {}
 io.on("connection", async (socket) => {
   console.log('SOCKET::', socket.handshake.address)
   socket.on("ADD_MESSAGE",async (message) => {
@@ -51,6 +53,18 @@ io.on("connection", async (socket) => {
     } catch (e) {
       socket.emit('errorEvent', {message: 'Delete Error Occured', error: e.message})
     }
+  })
+  socket.on('liveChat', (roomId, userName, content)=> {
+    liveChatObject[roomId] = {...liveChatObject[roomId], [userName]: content}
+    io.to(roomId).emit('liveMessages', liveChatObject[roomId])
+  })
+  socket.on('liveChatHandler',async (roomId, liveStatus) => {
+    const result = await RoomModel.findOneAndUpdate(
+      { roomId },
+      { $set: { liveChatEnabled: !liveStatus }},
+      { returnOriginal: false }
+    );
+    io.to(roomId).emit('liveChatStatusUpdate', result)
   })
 });
 
