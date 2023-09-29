@@ -30,6 +30,7 @@ const Login = () => {
     userName: '',
     roomName: '',
     roomId: '',
+    userPassword: ''
   });
   const [isProtected, setIsProtected] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
@@ -91,6 +92,7 @@ const Login = () => {
     userData.password = password;
     if (isNewRoom) {
       dispatch(createRoomAction({ ...userData, isProtected, password }));
+    userData.userName = `${userData.userName};${userData.password}`
     } else {
       dispatch(
         joinRoomAction({ ...userData, isProtected, password, isNewUser })
@@ -106,6 +108,7 @@ const Login = () => {
       userName: '',
       roomId: '',
       roomName: '',
+      userPassword: ''
     };
     setErrorMessage(emptyObejct);
     setUserData(emptyObejct);

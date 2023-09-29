@@ -45,7 +45,7 @@ const MessagesPage = () => {
       {' '}
       {room.isSuccess ? (
         <div className="chat-main">
-          <EmpList userData={userData} roomData={room} />
+          <EmpList userData={userData} roomData={room} socket={socket} />
           <ChatBox userData={userData} messages={messages} room={room} socket={socket} />
         </div>
       ) : (

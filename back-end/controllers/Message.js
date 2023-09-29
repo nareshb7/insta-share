@@ -13,7 +13,6 @@ module.exports.getRoomMessages = async (req, res) => {
 module.exports.newMessage = async (req, res) => {
   try {
     const { data } = req.body;
-    console.log("NEW_MESSAGE::", req.body);
     const newMessage = new MessageModel(req.body);
     await newMessage.save();
     res.status(201).json(newMessage);

@@ -21,6 +21,9 @@ interface ChatBoxProps {
   messages: MessageSlice;
   socket: Socket;
 }
+interface LiveChatProps {
+  [key: string]: string;
+}
 const downloadFile = async (
   e: React.MouseEvent,
   url: string = '',
@@ -31,7 +34,7 @@ const downloadFile = async (
   el.href = url;
   el.target = '_blank';
   el.download = fileName;
-  el.click(); 
+  el.click();
   return url;
 };
 const getMessageType = (data: string): string => {
@@ -90,9 +93,9 @@ const FileComponent = ({ file, className = '' }: FileComponentProps) => {
       </div>
       <span className="content">{file.content}</span>
       <span className="time-indicator">
-            {' '}
-            {file?.createdAt && new Date(file.createdAt).toLocaleTimeString()}
-          </span>
+        {' '}
+        {file?.createdAt && new Date(file.createdAt).toLocaleTimeString()}
+      </span>
     </div>
   );
 };
@@ -102,6 +105,7 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
   const [totalMessages, setTotalMessages] = useState<Message[]>(
     messages.messages
   );
+  const [livechatcontent, setLiveChatContent] = useState<LiveChatProps>({});
   const lastMszRef = useRef<HTMLDivElement | null>(null);
   socket.off('NEW_MESSAGE').on('NEW_MESSAGE', (msz) => {
     setTotalMessages((prev) => [...prev, msz]);
@@ -116,8 +120,33 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
       })
     );
   });
+  socket.off('liveMessages').on('liveMessages', (data)=> {
+    setLiveChatContent(data)
+  })
+  const handleLiveChat = (content: string)=> {
+    if (room.liveChatEnabled) {
+      setLiveChatContent({
+        ...livechatcontent,
+        [userData.userName?.split(';')[0]]: content,
+      });
+      socket.emit('liveChat',room.roomId, userData.userName?.split(';')[0], content )
+    }
+  }
   const handleChange = (e: HandleChangeProps) => {
-    setMessage(e.target.value);
+    const letters = e.target.value.split(' ')
+    const isValidMsz = letters.find(letter => letter.length > 20)
+    if (!isValidMsz && e.target.value.length < 100) {
+      setMessage(e.target.value);
+      handleLiveChat(e.target.value)
+    } else {
+      const content = e.target.value.length < 100 ? "I want space": "More than 100 characters not allowed"
+      dispatch(
+        addNotification({
+          content,
+          severity: Severity.ERROR,
+        })
+      );
+    }
   };
   const handleDeleteMessage = async (msz: Message) => {
     if (
@@ -192,6 +221,10 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
       fileId,
     };
     setMessage('');
+    setLiveChatContent({
+      ...livechatcontent,
+      [userData.userName?.split(';')[0]]: '',
+    });
     socket.emit('ADD_MESSAGE', msz);
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -220,6 +253,14 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
       </div>
       <div className="chat-body">
         <Card data={totalMessages} render={messageRender} />
+      </div>
+      <div>
+        {room.liveChatEnabled &&
+          Object.keys(livechatcontent).filter(val => livechatcontent[val].length > 0).map((user, idx) => (
+            <div key={idx}>
+              {user}: {livechatcontent[user]}
+            </div>
+          ))}
       </div>
       <div className="chat-footer">
         <label className="file-label">
