@@ -49,8 +49,11 @@ module.exports.joinRoom = async (req, res) => {
     );
     if (isExistedUser && newRoom.ownerName === userName.split(";")[0]) {
       const ownerPassword = userName.split(";")[1];
-      if (ownerPassword !== newRoom.ownerPassword) {
+      if (!ownerPassword) {
         throw new Error("Owner account needs password to login");
+      }
+      if (ownerPassword !== newRoom.ownerPassword) {
+        throw new Error("Owner account password is not matching");
       }
     }
     if (isExistedUser && isNewUser) {

@@ -15,7 +15,7 @@ const RoutesPage = () => {
   return (
     <div className="routes">
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={userData.roomId ? <Navigate to='/messages' /> : <Login />} />
         <Route
           path="/messages"
           element={userData.roomId ? <MessagesPage /> : <Navigate to='/' />}

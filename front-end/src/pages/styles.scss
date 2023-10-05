@@ -59,7 +59,7 @@
         width: 20%;
         .card {
             overflow: hidden scroll;
-            height: 400px;
+            height: 330px;
         }
     }
     .chat-box {
@@ -90,5 +90,6 @@
     .copyright-tag {
         text-align: center;
         color: #444;
+        padding-block: 10px;
     }
 }

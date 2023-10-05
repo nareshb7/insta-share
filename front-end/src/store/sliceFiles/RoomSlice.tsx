@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Users {
   userName: string;
-  ipAddress: string
+  ipAddress: string;
+  joinedDate: string
 }
 export interface PublicRooms {
   isProtected: boolean;

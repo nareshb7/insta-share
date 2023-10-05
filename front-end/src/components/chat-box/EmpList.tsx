@@ -46,7 +46,7 @@ const EmpList = ({ userData, roomData, socket }: EmpListProps) => {
             <h4>
               Enable Live Chat:{' '}
               <Button
-                text={roomData.liveChatEnabled ? 'OFF' : 'On'}
+                text={roomData.liveChatEnabled ? 'On' : 'Off'}
                 onClick={handleLiveChat}
               />
             </h4>
@@ -57,7 +57,7 @@ const EmpList = ({ userData, roomData, socket }: EmpListProps) => {
       ) : (
         <Card
           data={roomData.users}
-          render={(item) => <h4>{item.userName} - <span title='System - ID'>{item.ipAddress.split('.')[3]}</span></h4>}
+          render={(item) => <h4>{item.userName} - <span title='System - ID'>{item.ipAddress.split('.')[3]}</span> <span style={{fontSize:'12px'}}>- {new Date(item.joinedDate).toLocaleString()}</span></h4>}
         />
       )}
     </div>
