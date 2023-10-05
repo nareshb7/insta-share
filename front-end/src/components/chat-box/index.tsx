@@ -120,26 +120,34 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
       })
     );
   });
-  socket.off('liveMessages').on('liveMessages', (data)=> {
-    setLiveChatContent(data)
-  })
-  const handleLiveChat = (content: string)=> {
+  socket.off('liveMessages').on('liveMessages', (data) => {
+    setLiveChatContent(data);
+  });
+  const handleLiveChat = (content: string) => {
     if (room.liveChatEnabled) {
       setLiveChatContent({
         ...livechatcontent,
         [userData.userName?.split(';')[0]]: content,
       });
-      socket.emit('liveChat',room.roomId, userData.userName?.split(';')[0], content )
+      socket.emit(
+        'liveChat',
+        room.roomId,
+        userData.userName?.split(';')[0],
+        content
+      );
     }
-  }
+  };
   const handleChange = (e: HandleChangeProps) => {
-    const letters = e.target.value.split(' ')
-    const isValidMsz = letters.find(letter => letter.length > 20)
+    const letters = e.target.value.split(' ');
+    const isValidMsz = letters.find((letter) => letter.length > 20);
     if (!isValidMsz && e.target.value.length < 200) {
       setMessage(e.target.value);
-      handleLiveChat(e.target.value)
+      handleLiveChat(e.target.value);
     } else {
-      const content = e.target.value.length < 200 ? "I want space": "More than 200 characters not allowed"
+      const content =
+        e.target.value.length < 200
+          ? 'I want space'
+          : 'More than 200 characters not allowed';
       dispatch(
         addNotification({
           content,
@@ -149,10 +157,8 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
     }
   };
   const handleDeleteMessage = async (msz: Message) => {
-    if (
-      userData.userName === msz.from ||
-      userData.userName === room.ownerName
-    ) {
+    const userName = userData.userName.split(';')[0];
+    if (userName === msz.from || userName === room.ownerName) {
       const cnfrm = window.confirm('Do u want to delete this msz??');
       if (cnfrm) {
         socket.emit('DELETE_MESSAGE', msz._id);
@@ -256,11 +262,13 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
       </div>
       <div>
         {room.liveChatEnabled &&
-          Object.keys(livechatcontent).filter(val => livechatcontent[val].length > 0).map((user, idx) => (
-            <div key={idx}>
-              {user}: {livechatcontent[user]}
-            </div>
-          ))}
+          Object.keys(livechatcontent)
+            .filter((val) => livechatcontent[val].length > 0)
+            .map((user, idx) => (
+              <div key={idx}>
+                {user}: {livechatcontent[user]}
+              </div>
+            ))}
       </div>
       <div className="chat-footer">
         <label className="file-label">

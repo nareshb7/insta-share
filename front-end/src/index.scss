@@ -37,10 +37,21 @@ $primary-color: #007bff;
     position: fixed;
     right: 35px;
     top: 50px;
+    .content {
+      display: inline-block;
+      width: 85%;
+    }
     .icon {
       font-weight: bold;
       position: absolute;
       right: 10px;
+    }
+    .line {
+      display: block;
+      position: absolute;
+      bottom: 0px;
+      left: 2px;
+      animation: widthReducer 5s  0s normal none;
     }
   }
 }
@@ -80,4 +91,9 @@ $primary-color: #007bff;
   color: rgb(85, 199, 123);
   margin: 0 0 10px 8px;
   font-size: 12px;
+}
+
+@keyframes widthReducer {
+  0%   {width: 100%}
+  100% {width: 0;}
 }
