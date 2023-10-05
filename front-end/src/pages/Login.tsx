@@ -24,7 +24,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const roomState = useSelector((state: RootState) => state.room);
-  const { isLoading} = roomState;
+  const { isLoading } = roomState;
   const [isNewRoom, setNewRoom] = useState<boolean>(true);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [btnDisable, setBtnDisable] = useState<boolean>(true);
@@ -105,6 +105,12 @@ const Login = () => {
         );
       } else if (data.roomId) {
         dispatch(joinRoom(data));
+        dispatch(
+          addNotification({
+            content: 'Room Created Successfully',
+            severity: Severity.SUCCESS,
+          })
+        );
         setUserData(formData);
         localStorage.setItem('file-share-user', JSON.stringify(formData));
         navigate('/messages');
@@ -119,12 +125,17 @@ const Login = () => {
         dispatch(fetchRoomDataFailure(data.error as string));
       } else if (data.roomId) {
         dispatch(joinRoom(data));
+        dispatch(
+          addNotification({
+            content: 'Login Success',
+            severity: Severity.SUCCESS,
+          })
+        );
         setUserData(formData);
         localStorage.setItem('file-share-user', JSON.stringify(formData));
         navigate('/messages');
       }
     }
-    
   };
   const handleRoom = (status: boolean) => {
     setNewRoom(status);
@@ -146,7 +157,7 @@ const Login = () => {
     setIsProtected(!isProtected);
     setPassword('');
   };
-  const handlePublicRoomClick =async (room: PublicRooms) => {
+  const handlePublicRoomClick = async (room: PublicRooms) => {
     const name = window.prompt('Enter your name??');
     if (name) {
       const obj = {
@@ -166,6 +177,12 @@ const Login = () => {
         dispatch(fetchRoomDataFailure(data.error as string));
       } else if (data.roomId) {
         dispatch(joinRoom(data));
+        dispatch(
+          addNotification({
+            content: 'Login Success',
+            severity: Severity.SUCCESS,
+          })
+        );
         setUserData(formData);
         localStorage.setItem('file-share-user', JSON.stringify(formData));
         navigate('/messages');
@@ -318,7 +335,9 @@ const Login = () => {
         )}
       </div>
       <div className="public-rooms">
-        <h2>Public Rooms:</h2>
+        <h2 title="These are the rooms created without password">
+          Public Rooms:
+        </h2>
         {roomState.publicRooms.length > 0 ? (
           <Card data={roomState.publicRooms} render={roomsRender} />
         ) : (
