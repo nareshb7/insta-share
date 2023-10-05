@@ -135,11 +135,11 @@ const ChatBox = ({ userData, messages, room, socket }: ChatBoxProps) => {
   const handleChange = (e: HandleChangeProps) => {
     const letters = e.target.value.split(' ')
     const isValidMsz = letters.find(letter => letter.length > 20)
-    if (!isValidMsz && e.target.value.length < 100) {
+    if (!isValidMsz && e.target.value.length < 200) {
       setMessage(e.target.value);
       handleLiveChat(e.target.value)
     } else {
-      const content = e.target.value.length < 100 ? "I want space": "More than 100 characters not allowed"
+      const content = e.target.value.length < 200 ? "I want space": "More than 200 characters not allowed"
       dispatch(
         addNotification({
           content,

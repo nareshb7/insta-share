@@ -6,23 +6,25 @@ import { Button } from '../utils/reusable/styles/Design';
 import { UserData } from '../context/Models';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
-import { createRoomAction, getPublicRoomsAction, joinRoomAction } from '../store/saga/Actions';
+import { getPublicRoomsAction } from '../store/saga/Actions';
 import {
   PublicRooms,
   fetchRoomDataFailure,
   fetchRoomDataStart,
+  joinRoom,
 } from '../store/sliceFiles/RoomSlice';
 import { RootState } from '../store/Store';
 import Card from '../utils/reusable/card/Card';
 import { addNotification } from '../store/sliceFiles/Notification';
 import { Severity } from '../utils/Notification';
+import { createRoomApi, joinRoomApi } from '../store/api/RoomHandlerApi';
 
 const Login = () => {
   const userContext = useUserContext();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const roomState = useSelector((state: RootState) => state.room);
-  const { isLoading, isSuccess, roomId } = roomState;
+  const { isLoading} = roomState;
   const [isNewRoom, setNewRoom] = useState<boolean>(true);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [btnDisable, setBtnDisable] = useState<boolean>(true);
@@ -30,51 +32,56 @@ const Login = () => {
     userName: '',
     roomName: '',
     roomId: '',
-    userPassword: ''
+    userPassword: '',
+  });
+  const [formData, setFormData] = useState<UserData>({
+    userName: '',
+    roomName: '',
+    roomId: '',
+    userPassword: '',
+    password: '',
+    isProtected: false,
   });
   const [isProtected, setIsProtected] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isSuccess) {
-      socket.emit('join-room', roomId);
-      navigate('/messages');
-    }
-  }, [isSuccess]);
-  useEffect(()=> {
-    dispatch(getPublicRoomsAction())
-  }, [])
+    dispatch(getPublicRoomsAction());
+  }, []);
 
   if (userContext === null) {
     // Handle the case where the context is null
     return <div>Loading...</div>; // or some other fallback
   }
-  const { userData, setUserData, socket } = userContext;
+  const { setUserData } = userContext;
   const handleChange = (e: HandleChangeProps) => {
     const { name, value } = e.target;
-    setUserData((prevUserData) => ({
+    setFormData((prevUserData) => ({
       ...prevUserData,
       [name]: value,
     }));
   };
   const handleValidate = (): boolean => {
     let count = 0;
-    if (!userData.userName) {
+    if (!formData.userName) {
       setErrorMessage((prev) => ({ ...prev, userNameame: 'Name required' }));
       count++;
     } else {
       setErrorMessage((prev) => ({ ...prev, userName: '' }));
     }
-    if (!userData.roomId) {
+    if (!formData.roomId) {
       setErrorMessage((prev) => ({ ...prev, roomId: 'Room Id required' }));
       count++;
     } else {
       setErrorMessage((prev) => ({ ...prev, roomId: '' }));
     }
     if (isNewRoom) {
-      if (!userData.roomName) {
-        setErrorMessage((prev) => ({ ...prev, roomName: 'Room Name required' }));
+      if (!formData.roomName) {
+        setErrorMessage((prev) => ({
+          ...prev,
+          roomName: 'Room Name required',
+        }));
         count++;
       } else {
         setErrorMessage((prev) => ({ ...prev, roomName: '' }));
@@ -85,21 +92,39 @@ const Login = () => {
     return count === 0 ? true : false;
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     dispatch(fetchRoomDataStart());
-    // userData.roomName = roomName;
-    userData.isProtected = isProtected;
-    userData.password = password;
+    formData.isProtected = isProtected;
+    formData.password = password;
     if (isNewRoom) {
-      dispatch(createRoomAction({ ...userData, isProtected, password }));
-    userData.userName = `${userData.userName};${userData.password}`
+      const data = await createRoomApi({ ...formData, isProtected, password });
+      if (data?.error) {
+        dispatch(fetchRoomDataFailure(data.error as string));
+        dispatch(
+          addNotification({ content: data.error, severity: Severity.ERROR })
+        );
+      } else if (data.roomId) {
+        dispatch(joinRoom(data));
+        setUserData(formData);
+        localStorage.setItem('file-share-user', JSON.stringify(formData));
+        navigate('/messages');
+      }
+      formData.userName = `${formData.userName};${formData.password}`;
     } else {
-      dispatch(
-        joinRoomAction({ ...userData, isProtected, password, isNewUser })
-      );
+      const data = await joinRoomApi({ ...formData, isProtected, password });
+      if (data?.error) {
+        dispatch(
+          addNotification({ content: data.error, severity: Severity.ERROR })
+        );
+        dispatch(fetchRoomDataFailure(data.error as string));
+      } else if (data.roomId) {
+        dispatch(joinRoom(data));
+        setUserData(formData);
+        localStorage.setItem('file-share-user', JSON.stringify(formData));
+        navigate('/messages');
+      }
     }
-    setUserData(userData);
-    localStorage.setItem('file-share-user', JSON.stringify(userData));
+    
   };
   const handleRoom = (status: boolean) => {
     setNewRoom(status);
@@ -108,10 +133,11 @@ const Login = () => {
       userName: '',
       roomId: '',
       roomName: '',
-      userPassword: ''
+      userPassword: '',
     };
     setErrorMessage(emptyObejct);
     setUserData(emptyObejct);
+    setFormData(emptyObejct);
     setIsProtected(false);
     setPassword('');
     dispatch(fetchRoomDataFailure(''));
@@ -120,28 +146,44 @@ const Login = () => {
     setIsProtected(!isProtected);
     setPassword('');
   };
-  const handlePublicRoomClick = (room: PublicRooms) => {
-    const name = window.prompt('Enter your name??')
+  const handlePublicRoomClick =async (room: PublicRooms) => {
+    const name = window.prompt('Enter your name??');
     if (name) {
-      const obj = {userName: name.split(';')[0], roomId: room.roomId, roomName: room.roomName}
-      setUserData(obj)
+      const obj = {
+        userName: name.split(';')[0],
+        roomId: room.roomId,
+        roomName: room.roomName,
+      };
+      setUserData(obj);
       setNewRoom(false);
       setShowForm(true);
-      setBtnDisable(false)
-      dispatch(
-        joinRoomAction({ ...obj, isProtected, password, isNewUser })
-      );
-      localStorage.setItem('file-share-user', JSON.stringify(obj));
+      setBtnDisable(false);
+      const data = await joinRoomApi({ ...formData, isProtected, password });
+      if (data?.error) {
+        dispatch(
+          addNotification({ content: data.error, severity: Severity.ERROR })
+        );
+        dispatch(fetchRoomDataFailure(data.error as string));
+      } else if (data.roomId) {
+        dispatch(joinRoom(data));
+        setUserData(formData);
+        localStorage.setItem('file-share-user', JSON.stringify(formData));
+        navigate('/messages');
+      }
     } else {
-      dispatch(addNotification({
-        content: 'Name Required',
-        severity: Severity.ERROR
-      }))
+      dispatch(
+        addNotification({
+          content: 'Name Required',
+          severity: Severity.ERROR,
+        })
+      );
     }
-  }
+  };
   const roomsRender = (data: PublicRooms) => (
-    <h5 key={data._id} onClick={() => handlePublicRoomClick(data)}>{data.roomName}</h5>
-  )
+    <h5 key={data._id} onClick={() => handlePublicRoomClick(data)}>
+      {data.roomName}
+    </h5>
+  );
   return (
     <div className="auth-page">
       <div className="login-page">
@@ -151,44 +193,62 @@ const Login = () => {
         </div>
         {showForm && (
           <div>
-            {isNewRoom ? <h4>Create New Room: </h4> : <h4>Enter Room Data: </h4>}
+            {isNewRoom ? (
+              <h4>Create New Room: </h4>
+            ) : (
+              <h4>Enter Room Data: </h4>
+            )}
             <div>
               <label>
                 <input
                   className="form-control"
                   name="userName"
-                  value={userData.userName}
+                  value={formData.userName}
                   onChange={handleChange}
                   placeholder="Enter your name..."
                   onBlur={handleValidate}
                   onKeyUp={handleValidate}
                 />
               </label>
-              {
-                isNewRoom && <div><label>
-                <input
-                  className="form-control"
-                  name="userPassword"
-                  value={userData.userPassword}
-                  onChange={handleChange}
-                  placeholder="Enter your password..."
-                  onBlur={handleValidate}
-                  onKeyUp={handleValidate}
-                />
-              </label>
-              <p className='info-message'>U need to pass this password with username when u r logging in </p>
-              <p>like test;123</p>
-              </div>
-              }
+              {isNewRoom && (
+                <div>
+                  <label>
+                    <input
+                      className="form-control"
+                      name="userPassword"
+                      value={formData.userPassword}
+                      onChange={handleChange}
+                      placeholder="Enter your password..."
+                      onBlur={handleValidate}
+                      onKeyUp={handleValidate}
+                    />
+                  </label>
+                  <p className="info-message">
+                    U need to pass this password with username when u r logging
+                    in{' '}
+                  </p>
+                  <p>like test;123</p>
+                </div>
+              )}
               {!isNewRoom && (
                 <div>
-                  <label style={{color: roomState.error.includes('Someone has') ? '#f00': ''}}>
+                  <label
+                    style={{
+                      color: roomState.error.includes('Someone has')
+                        ? '#f00'
+                        : '',
+                    }}
+                  >
                     If you are new user click here
                     <input
                       checked={isNewUser}
                       onChange={(e) => setIsNewUser(e.target.checked)}
                       type="checkbox"
-                      style={{color: roomState.error.includes('Someone has') ? '#f00': ''}}
+                      style={{
+                        color: roomState.error.includes('Someone has')
+                          ? '#f00'
+                          : '',
+                      }}
                     />
                   </label>
                 </div>
@@ -200,7 +260,7 @@ const Login = () => {
                 <input
                   className="form-control"
                   name="roomId"
-                  value={userData?.roomId}
+                  value={formData?.roomId}
                   onChange={handleChange}
                   placeholder="Enter room id..."
                   onBlur={handleValidate}
@@ -214,7 +274,7 @@ const Login = () => {
                 <input
                   className="form-control"
                   name="roomName"
-                  value={userData.roomName}
+                  value={formData.roomName}
                   onChange={handleChange}
                   placeholder="Enter room name..."
                   onBlur={handleValidate}
@@ -257,13 +317,13 @@ const Login = () => {
           </div>
         )}
       </div>
-      <div className='public-rooms'>
+      <div className="public-rooms">
         <h2>Public Rooms:</h2>
-        {
-        roomState.publicRooms.length > 0 ? 
-        <Card data={roomState.publicRooms} render={roomsRender}/>: 
-        <h5>NO PUBLIC_ROOMS AVAILABLE</h5>
-        }
+        {roomState.publicRooms.length > 0 ? (
+          <Card data={roomState.publicRooms} render={roomsRender} />
+        ) : (
+          <h5>NO PUBLIC_ROOMS AVAILABLE</h5>
+        )}
       </div>
     </div>
   );
