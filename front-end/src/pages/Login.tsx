@@ -226,9 +226,11 @@ const Login = () => {
                   onBlur={handleValidate}
                   onKeyUp={handleValidate}
                 />
-                <p className="info-message">
-                    If u r an admin, U have to add the password with username by separating ;
-                  </p>
+                {
+                  !isNewRoom && <p className="info-message">
+                  If u r an admin, U have to add the password with username by separating ;
+                </p>
+                }
               </label>
               {isNewRoom && (
                 <div>
