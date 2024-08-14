@@ -31,7 +31,7 @@ module.exports.joinRoom = async (req, res) => {
   try {
     const { params } = req.body;
     console.log("JOIN_ROOM::", params, req.ip);
-    const { roomId, password, userName, isNewUser, isProtected } = params;
+    const { roomId, password, userName, isNewUser, isProtected, userPassword } = params;
     const newRoom = await RoomModel.findOne({ roomId: roomId });
     if (!newRoom) {
       throw new Error("Room Id not found");
@@ -48,7 +48,8 @@ module.exports.joinRoom = async (req, res) => {
       (val) => val.userName === userName.split(";")[0]
     );
     if (isExistedUser && newRoom.ownerName === userName.split(";")[0]) {
-      const ownerPassword = userName.split(";")[1];
+
+      const ownerPassword = userPassword;
       if (!ownerPassword) {
         throw new Error("Owner account needs password to login");
       }
@@ -79,6 +80,7 @@ module.exports.joinRoom = async (req, res) => {
 
 module.exports.publicRooms = async (req, res) => {
   try {
+    console.log("PUBMIC_ROMS:::::")
     const rooms = await RoomModel.find({ isProtected: false });
     res.status(200).json(rooms);
   } catch (e) {
