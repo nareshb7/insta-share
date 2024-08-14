@@ -183,7 +183,7 @@ const Login = () => {
             severity: Severity.SUCCESS,
           })
         );
-        setUserData(formData);
+        setUserData({ ...formData,...obj, isProtected, password });
         localStorage.setItem('file-share-user', JSON.stringify(formData));
         navigate('/messages');
       }
