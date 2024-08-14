@@ -7,6 +7,7 @@ import { useUserContext } from '../context/UserContext';
 import { RootState } from '../store/Store';
 import { joinRoomAction } from '../store/saga/Actions';
 import { Link } from 'react-router-dom';
+import { UserData } from '../context/Models';
 
 const MessagesPage = () => {
   const userContext = useUserContext();
@@ -33,6 +34,7 @@ const MessagesPage = () => {
   useEffect(() => {
     if (room.error) {
       setErrorMessage(room.error);
+      userContext?.setUserData({} as UserData)
     }
   }, [room.error]);
   if (userContext === null) {

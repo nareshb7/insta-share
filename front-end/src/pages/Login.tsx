@@ -117,7 +117,7 @@ const Login = () => {
       }
       formData.userName = `${formData.userName};${formData.password}`;
     } else {
-      const data = await joinRoomApi({ ...formData, isProtected, password });
+      const data = await joinRoomApi({ ...formData, isProtected, password, isNewUser });
       if (data?.error) {
         dispatch(
           addNotification({ content: data.error, severity: Severity.ERROR })
@@ -169,7 +169,7 @@ const Login = () => {
       setNewRoom(false);
       setShowForm(true);
       setBtnDisable(false);
-      const data = await joinRoomApi({ ...formData, isProtected, password });
+      const data = await joinRoomApi({ ...formData,...obj, isProtected, password });
       if (data?.error) {
         dispatch(
           addNotification({ content: data.error, severity: Severity.ERROR })
@@ -226,6 +226,9 @@ const Login = () => {
                   onBlur={handleValidate}
                   onKeyUp={handleValidate}
                 />
+                <p className="info-message">
+                    If u r an admin, U have to add the password with username by separating ;
+                  </p>
               </label>
               {isNewRoom && (
                 <div>
