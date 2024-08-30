@@ -12,7 +12,7 @@ module.exports.createRoom = async (req, res) => {
     });
 
     newRoom.users.push({
-      userName: params.userName.split(";")[0],
+      userName: params.userName,
       ipAddress: req.ip,
       joinedDate: new Date(),
     });
@@ -31,7 +31,7 @@ module.exports.joinRoom = async (req, res) => {
   try {
     const { params } = req.body;
     console.log("JOIN_ROOM::", params, req.ip);
-    const { roomId, password, userName, isNewUser, isProtected } = params;
+    const { roomId, roomPassword, userName, isNewUser, isProtected, userPassword } = params;
     const newRoom = await RoomModel.findOne({ roomId: roomId });
     if (!newRoom) {
       throw new Error("Room Id not found");
@@ -40,19 +40,18 @@ module.exports.joinRoom = async (req, res) => {
       if (!isProtected) {
         throw new Error("This room is protected please prvoide password");
       }
-      if (newRoom.password !== password) {
+      if (newRoom.roomPassword !== roomPassword) {
         throw new Error("Room password not matching");
       }
     }
     const isExistedUser = newRoom.users.find(
-      (val) => val.userName === userName.split(";")[0]
+      (val) => val.userName === userName
     );
-    if (isExistedUser && newRoom.ownerName === userName.split(";")[0]) {
-      const ownerPassword = userName.split(";")[1];
-      if (!ownerPassword) {
+    if (isExistedUser && newRoom.ownerName === userName) {
+      if (!userPassword) {
         throw new Error("Owner account needs password to login");
       }
-      if (ownerPassword !== newRoom.ownerPassword) {
+      if (userPassword !== newRoom.ownerPassword) {
         throw new Error("Owner account password is not matching");
       }
     }
@@ -60,7 +59,7 @@ module.exports.joinRoom = async (req, res) => {
       throw new Error("Someone has already joined with same User name");
     } else if (isNewUser && !isExistedUser) {
       newRoom.users.push({
-        userName: userName.split(";")[0],
+        userName: userName,
         ipAddress: req.ip,
         joinedDate: new Date(),
       });

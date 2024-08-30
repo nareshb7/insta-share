@@ -37,6 +37,6 @@ const UserContext = ({ children }: UserContextProps) => {
     </ContextData.Provider>
   )
 }
-export const  useUserContext = () => useContext(ContextData)
+export const  useUserContext = () => useContext(ContextData) as ContextState
 
 export default UserContext

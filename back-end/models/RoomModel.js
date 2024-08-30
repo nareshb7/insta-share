@@ -31,7 +31,7 @@ const roomSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    password: String,
+    roomPassword: String,
     liveChatEnabled: {
       type: Boolean,
       default: false,

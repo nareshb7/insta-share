@@ -1,0 +1,93 @@
+export const createRoomConfig = [
+    {
+        id: 1,
+        name: "userName",
+        placeholder: "User name",
+        type: "text",
+        required: true,
+        label: "User Name:",
+    },{
+        id: 2,
+        name: "userPassword",
+        placeholder: "User password",
+        type: "text",
+        required: true,
+        label: "User Password:",
+    },{
+        id: 3,
+        name: "roomId",
+        placeholder: "Room Id",
+        type: "text",
+        required: true,
+        label: "Enter Room ID",
+    },{
+        id: 4,
+        name: "roomName",
+        placeholder: "User name",
+        type: "text",
+        required: true,
+        label: "Room Name:",
+    },{
+        id: 5,
+        name: "isProtected",
+        placeholder: "User name",
+        type: "checkbox",
+        required: true,
+        label: "Do u want room to be protected?",
+    },{
+        id: 6,
+        name: "roomPassword",
+        placeholder: "Room Password",
+        type: "text",
+        required: false,
+        label: "Enter Room Password",
+    },
+]
+
+export const joinRoomConfig = [
+    {
+        id: 1,
+        name: "userName",
+        placeholder: "User name",
+        type: "text",
+        required: true,
+        label: "Enter User Name",
+    },{
+        id: 2,
+        name: "userPassword",
+        placeholder: "User password",
+        type: "text",
+        required: false,
+        label: "If u r Admin, Enter Password",
+    },{
+        id: 3,
+        name: "roomId",
+        placeholder: "Room Id",
+        type: "text",
+        required: true,
+        label: "Enter Room Id",
+    },
+    {
+        id: 4,
+        name: "isProtected",
+        placeholder: "",
+        type: "checkbox",
+        required: false,
+        label: "Is Room is Protected?",
+    },{
+        id: 5,
+        name: "roomPassword",
+        placeholder: "Room Password",
+        type: "text",
+        required: false,
+        label: "Enter Room Password",
+    },
+    {
+        id: 6,
+        name: "isNewUser",
+        placeholder: "",
+        type: "checkbox",
+        required: true,
+        label: "Are u a new user?",
+    },
+]

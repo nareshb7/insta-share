@@ -5,7 +5,7 @@ import { Socket } from 'socket.io-client';
 import './styles.scss';
 import { HandleChangeProps } from '../models/AuthModels';
 import Card from '../../utils/reusable/card/Card';
-import { Button } from '../../utils/reusable/styles/Design';
+import { Button } from '../../common/input';
 import { UserData } from '../../context/Models';
 import { getRoomMessages } from '../../store/saga/Actions';
 import { Message, MessageSlice } from '../../store/sliceFiles/MessagesSlice';

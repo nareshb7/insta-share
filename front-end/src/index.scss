@@ -93,6 +93,21 @@ $primary-color: #007bff;
   font-size: 12px;
 }
 
+.btnC {
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  margin: 10px;
+  border: 1px solid #f0f;
+  cursor: pointer;
+}
+.btn-primary {
+  background-color: #96abf7;
+}
+.mandatory {
+  color: #f00
+}
+
 @keyframes widthReducer {
   0%   {width: 100%}
   100% {width: 0;}

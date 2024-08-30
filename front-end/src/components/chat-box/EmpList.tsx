@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Card from '../../utils/reusable/card/Card';
 import { UserData } from '../../context/Models';
 import { RoomSliceState, joinRoom } from '../../store/sliceFiles/RoomSlice';
-import { Button } from '../../utils/reusable/styles/Design';
+import { Button } from '../../common/input';
 import { useDispatch } from 'react-redux';
 import { Socket } from 'socket.io-client';
 
