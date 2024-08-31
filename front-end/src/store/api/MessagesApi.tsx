@@ -2,7 +2,7 @@ import { SendMessageType } from "../saga/Actions"
 
 const LOCAL_URL = "http://localhost:8081"
 const SERVER_URL = "https://insta-share-58lx.onrender.com"
-export const BE_URL = LOCAL_URL
+export const BE_URL = SERVER_URL
 export const getMessagesApi = async (id: string): Promise<string[]> => {
     return fetch(`${BE_URL}/message/${id}`, {
         method:'GET',
